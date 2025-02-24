@@ -17,8 +17,8 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
-const LoginScreen=() => {
 
+const LoginScreen = () => {
   const router = useRouter();
   const [form, setForm] = useState({ email: "", password: "" });
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -28,17 +28,15 @@ const LoginScreen=() => {
     setForm({ ...form, [key]: value });
   };
 
-
   const handleLogin = () => {
-    // if (!form.email || !form.password) {
-    //   alert("Please enter both email and password");
-    //   return;
-    // }
+    if (!form.email || !form.password) {
+      alert("Please enter both email and password");
+      return;
+    }
     console.log("Logged In:", form);
     router.push("/signup");
   };
 
-  
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener("keyboardDidShow", () => {
       setKeyboardVisible(true);
@@ -79,6 +77,7 @@ const LoginScreen=() => {
               value={form.email}
               onChangeText={(text) => handleInputChange("email", text)}
             />
+            <View style={styles.divider} />
           </View>
 
           <View style={styles.inputWrapper}>
@@ -86,7 +85,7 @@ const LoginScreen=() => {
             <View style={styles.passwordContainer}>
               <TextInput
                 style={styles.passwordInput}
-                placeholder="********"
+                placeholder="Enter your password"
                 placeholderTextColor="#888"
                 secureTextEntry={!passwordVisible}
                 value={form.password}
@@ -96,6 +95,7 @@ const LoginScreen=() => {
                 <Ionicons name={passwordVisible ? "eye-off" : "eye"} size={24} color="#888" />
               </TouchableOpacity>
             </View>
+            <View style={styles.divider} />
           </View>
 
           <TouchableOpacity onPress={() => console.log("Forgot Password Pressed")}>
@@ -118,7 +118,7 @@ const LoginScreen=() => {
       </KeyboardAvoidingView>
     </ImageBackground>
   );
-}
+};
 
 const styles = StyleSheet.create({
   background: {
@@ -167,25 +167,22 @@ const styles = StyleSheet.create({
   input: {
     width: "100%",
     height: height * 0.06,
-    borderColor: "#ddd",
-    borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 15,
     fontSize: width * 0.045,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "transparent",
+  },
+  divider: {
+    height: 1,
+    width: "100%",
+    backgroundColor: "#ddd",
   },
   passwordContainer: {
     flexDirection: "row",
     alignItems: "center",
-    borderColor: "#ddd",
-    borderWidth: 1,
-    borderRadius: 10,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "transparent",
   },
   passwordInput: {
     flex: 1,
     height: height * 0.06,
-    paddingHorizontal: 15,
     fontSize: width * 0.045,
   },
   eyeIcon: {

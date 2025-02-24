@@ -1,31 +1,38 @@
 import { useRouter } from "expo-router";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Image,
-  Platform,
-  Dimensions,
-} from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Image, Dimensions } from "react-native";
 import BackgroundScreen from "../components/BackgroundScreen";
-import { Picker } from "@react-native-picker/picker";
+import DropDownPicker from "react-native-dropdown-picker";
 import { useState } from "react";
 
 const { width, height } = Dimensions.get("window");
 
 const LocationScreen = () => {
   const router = useRouter();
-  const [selectedZone, setSelectedZone] = useState("Lagos");
-  const [selectedArea, setSelectedArea] = useState("");
+  
+  const [openZone, setOpenZone] = useState(false);
+  const [selectedZone, setSelectedZone] = useState(null);
+  const [zones, setZones] = useState([
+    { label: "Lagos", value: "Lagos" },
+    { label: "Port Harcourt", value: "Port Harcourt" },
+    { label: "Abuja", value: "Abuja" },
+    { label: "Kaduna", value: "Kaduna" },
+  ]);
+
+  const [openArea, setOpenArea] = useState(false);
+  const [selectedArea, setSelectedArea] = useState(null);
+  const [areas, setAreas] = useState([
+    { label: "South West", value: "South West" },
+    { label: "South South", value: "South South" },
+    { label: "North Central", value: "North Central" },
+    { label: "North East", value: "North East" },
+  ]);
 
   return (
     <BackgroundScreen onBack={() => router.back()}>
       <View style={styles.container}>
-      
+        
         <Image source={require("assets/images/location.png")} style={styles.image} />
 
-        
         <Text style={styles.header}>Select Your Location</Text>
         <Text style={styles.description}>
           Switch on your location to stay in tune with what’s happening in your area
@@ -33,41 +40,36 @@ const LocationScreen = () => {
 
         <View style={styles.dropdownContainer}>
           <Text style={styles.label}>Your Zone</Text>
-          <View style={styles.pickerWrapper}>
-            <Picker
-              selectedValue={selectedZone}
-              onValueChange={(itemValue) => setSelectedZone(itemValue)}
-              style={styles.picker}
-              mode={Platform.OS === "ios" ? "dropdown" : "dialog"} 
-            >
-              <Picker.Item label="Lagos" value="Lagos" />
-              <Picker.Item label="Port Harcourt" value="Port Harcourt" />
-              <Picker.Item label="Abuja" value="Abuja" />
-              <Picker.Item label="Kaduna" value="Kaduna" />
-            </Picker>
-          </View>
+          <DropDownPicker
+            open={openZone}
+            value={selectedZone}
+            items={zones}
+            setOpen={setOpenZone}
+            setValue={setSelectedZone}
+            setItems={setZones}
+            placeholder="Select your zone"
+            style={styles.dropdown}
+            dropDownContainerStyle={styles.dropDownContainer}
+            textStyle={styles.dropDownText}
+          />
         </View>
 
-  
         <View style={styles.dropdownContainer}>
           <Text style={styles.label}>Your Area</Text>
-          <View style={styles.pickerWrapper}>
-            <Picker
-              selectedValue={selectedArea}
-              onValueChange={(itemValue) => setSelectedArea(itemValue)}
-              style={styles.picker}
-              mode={Platform.OS === "ios" ? "dropdown" : "dialog"}
-            >
-              <Picker.Item label="Types of your area" value="" />
-              <Picker.Item label="South West" value="South West" />
-              <Picker.Item label="South South" value="South South" />
-              <Picker.Item label="North Central" value="North Central" />
-              <Picker.Item label="North East" value="North East" />
-            </Picker>
-          </View>
+          <DropDownPicker
+            open={openArea}
+            value={selectedArea}
+            items={areas}
+            setOpen={setOpenArea}
+            setValue={setSelectedArea}
+            setItems={setAreas}
+            placeholder="Select your area"
+            style={styles.dropdown}
+            dropDownContainerStyle={styles.dropDownContainer}
+            textStyle={styles.dropDownText}
+          />
         </View>
 
-        
         <TouchableOpacity style={styles.button} onPress={() => router.push("/login")}>
           <Text style={styles.buttonText}>Submit</Text>
         </TouchableOpacity>
@@ -79,13 +81,12 @@ const LocationScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: width * 0.05,
     justifyContent: "center",
     alignItems: "center",
   },
   image: {
     width: width * 0.6,
-    height: height * 0.3,
+    height: height * 0.25,
     resizeMode: "contain",
     marginBottom: height * 0.03,
   },
@@ -100,11 +101,12 @@ const styles = StyleSheet.create({
     fontFamily: "Gilroy-Regular",
     textAlign: "center",
     color: "#777",
-    marginBottom: height * 0.04,
+    marginBottom: height * 0.03,
   },
   dropdownContainer: {
     width: "100%",
     marginBottom: height * 0.03,
+    
   },
   label: {
     fontSize: width * 0.045,
@@ -112,16 +114,23 @@ const styles = StyleSheet.create({
     color: "#777",
     marginBottom: height * 0.005,
   },
-  pickerWrapper: {
+  dropdown: {
     borderWidth: 1,
     borderColor: "#ddd",
     borderRadius: 10,
-    overflow: "hidden",
+    backgroundColor: "#fff",
+    height: height * 0.06,
+  },
+  dropDownContainer: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 10,
     backgroundColor: "#fff",
   },
-  picker: {
-    height: height * 0.06,
-    width: "100%",
+  dropDownText: {
+    fontSize: width * 0.04,
+    fontFamily: "Gilroy-Medium",
+    color: "#000",
   },
   button: {
     backgroundColor: "#53B175",
@@ -129,7 +138,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: "100%",
     alignItems: "center",
-    marginTop: height * 0.03,
+    marginTop: height * 0.02,
   },
   buttonText: {
     fontSize: width * 0.05,
