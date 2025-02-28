@@ -4,54 +4,25 @@ import {
   Text,
   TextInput,
   StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
   Dimensions,
+  TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
 import BackgroundScreen from "../components/BackgroundScreen";
-import { useEffect, useState } from "react";
+import { COLORS, FONTS, SIZES } from "assets/styles/theme";
 
 const { width, height } = Dimensions.get("window");
 
 const OtpScreen = () => {
   const router = useRouter();
-  const [resendOffset, setResendOffset] = useState(height * 0.5); 
-
-  useEffect(() => {
-    const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
-    const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
-
-    const keyboardDidShowListener = Keyboard.addListener(showEvent, (event) => {
-      setResendOffset(
-        Platform.OS === "android"
-          ? height * 0.05 
-          : event.endCoordinates.height + height * 0.05
-      );
-    });
-
-    const keyboardDidHideListener = Keyboard.addListener(hideEvent, () => {
-      setResendOffset(height * 0.32); 
-    });
-
-    return () => {
-      keyboardDidShowListener.remove();
-      keyboardDidHideListener.remove();
-    };
-  }, []);
 
   return (
     <BackgroundScreen onBack={() => router.back()} onNext={() => router.push("/location")}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.container}
-      >
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <View style={styles.container}>
           <View style={styles.inputSection}>
             <Text style={styles.header}>Enter your 4-digit code</Text>
             <Text style={styles.subText}>Code</Text>
-           
 
             <TextInput
               style={styles.input}
@@ -59,29 +30,23 @@ const OtpScreen = () => {
               autoFocus={true}
               maxLength={4}
               placeholder="- - - -"
-              placeholderTextColor="#999"
+              placeholderTextColor={COLORS.textDark}
               textAlign="left"
             />
           </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
 
-     
-      <View style={[styles.resendContainer, { bottom: resendOffset }]}>
-        <Text style={styles.resendText}>Resend Code</Text>
-      </View>
+          <View style={styles.resendContainer}>
+            <Text style={styles.resendText}>Resend Code</Text>
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
     </BackgroundScreen>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: "center",
-  },
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: "center",
+    width: "100%",
   },
   inputSection: {
     alignItems: "flex-start",
@@ -89,35 +54,37 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   header: {
-    fontSize: width * 0.06,
-    fontFamily: "Gilroy-Bold",
+    fontSize: SIZES.h1,
+    fontFamily: FONTS.semiBold,  
+    color: COLORS.textDark,
     textAlign: "left",
-    marginBottom: height * 0.03,
+    marginBottom: height * 0.01,
+    paddingBottom: height * 0.02,
   },
   subText: {
-    fontSize: width * 0.04,
-    fontFamily: "Gilroy-Regular",
-    color: "#7C7C7C",
+    fontSize: SIZES.body,
+    fontFamily: FONTS.medium,  
+    color: COLORS.textGray,
     marginBottom: height * 0.02,
   },
   input: {
-    fontSize: width * 0.06,
-    fontFamily: "Gilroy-Regular",
+    fontSize: SIZES.h3,
+    fontFamily: FONTS.medium,  
     borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
+    borderBottomColor: COLORS.border,
     paddingBottom: height * 0.02,
-    marginBottom: height * 0.02,
+    marginBottom: height * 0.55,
     width: "100%",
     textAlign: "left",
   },
   resendContainer: {
     position: "absolute",
-    left: width * 0.05,
+    bottom: height * 0.23,
   },
   resendText: {
-    fontSize: width * 0.045,
-    fontFamily: "Gilroy-Medium",
-    color: "#53B175",
+    fontSize: SIZES.h3,
+    fontFamily: FONTS.medium,  
+    color: COLORS.primary,
     textAlign: "left",
   },
 });

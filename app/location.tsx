@@ -3,12 +3,14 @@ import { View, Text, TouchableOpacity, StyleSheet, Image, Dimensions } from "rea
 import BackgroundScreen from "../components/BackgroundScreen";
 import DropDownPicker from "react-native-dropdown-picker";
 import { useState } from "react";
+import { COLORS, FONTS, SIZES } from "assets/styles/theme";
+import { IMAGES } from "assets/images";
 
 const { width, height } = Dimensions.get("window");
 
 const LocationScreen = () => {
   const router = useRouter();
-  
+
   const [openZone, setOpenZone] = useState(false);
   const [selectedZone, setSelectedZone] = useState(null);
   const [zones, setZones] = useState([
@@ -31,14 +33,14 @@ const LocationScreen = () => {
     <BackgroundScreen onBack={() => router.back()}>
       <View style={styles.container}>
         
-        <Image source={require("assets/images/location.png")} style={styles.image} />
+        <Image source={IMAGES.location} style={styles.image} />
 
         <Text style={styles.header}>Select Your Location</Text>
         <Text style={styles.description}>
           Switch on your location to stay in tune with what’s happening in your area
         </Text>
 
-        <View style={styles.dropdownContainer}>
+        <View style={[styles.dropdownWrapper, { zIndex: openZone ? 2000 : 1 }]}>
           <Text style={styles.label}>Your Zone</Text>
           <DropDownPicker
             open={openZone}
@@ -54,7 +56,7 @@ const LocationScreen = () => {
           />
         </View>
 
-        <View style={styles.dropdownContainer}>
+        <View style={[styles.dropdownWrapper, { zIndex: openArea ? 2000 : 1 }]}>
           <Text style={styles.label}>Your Area</Text>
           <DropDownPicker
             open={openArea}
@@ -91,49 +93,50 @@ const styles = StyleSheet.create({
     marginBottom: height * 0.03,
   },
   header: {
-    fontSize: width * 0.06,
-    fontFamily: "Gilroy-Bold",
+    fontSize: SIZES.h1,
+    fontFamily: FONTS.bold,
     textAlign: "center",
+    color: COLORS.textDark,
     marginBottom: height * 0.02,
   },
   description: {
-    fontSize: width * 0.04,
-    fontFamily: "Gilroy-Regular",
+    fontSize: SIZES.body,
+    fontFamily: FONTS.medium,
     textAlign: "center",
-    color: "#777",
+    color: COLORS.textGray,
     marginBottom: height * 0.03,
   },
-  dropdownContainer: {
+  dropdownWrapper: {
     width: "100%",
     marginBottom: height * 0.03,
-    
+    overflow: "visible", 
   },
   label: {
-    fontSize: width * 0.045,
-    fontFamily: "Gilroy-Medium",
-    color: "#777",
+    fontSize: SIZES.body,
+    fontFamily: FONTS.medium,
+    color: COLORS.gray,
     marginBottom: height * 0.005,
   },
   dropdown: {
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: COLORS.border,
     borderRadius: 10,
-    backgroundColor: "#fff",
+    backgroundColor: COLORS.bright,
     height: height * 0.06,
   },
   dropDownContainer: {
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: COLORS.border,
     borderRadius: 10,
-    backgroundColor: "#fff",
+    backgroundColor: COLORS.bright,
   },
   dropDownText: {
-    fontSize: width * 0.04,
-    fontFamily: "Gilroy-Medium",
-    color: "#000",
+    fontSize: SIZES.body,
+    fontFamily: FONTS.medium,
+    color: COLORS.textDark,
   },
   button: {
-    backgroundColor: "#53B175",
+    backgroundColor: COLORS.primary,
     paddingVertical: height * 0.02,
     borderRadius: 10,
     width: "100%",
@@ -141,9 +144,9 @@ const styles = StyleSheet.create({
     marginTop: height * 0.02,
   },
   buttonText: {
-    fontSize: width * 0.05,
-    color: "#fff",
-    fontFamily: "Gilroy-Medium",
+    fontSize: SIZES.h3,
+    color: COLORS.bright,
+    fontFamily: FONTS.semiBold,
   },
 });
 

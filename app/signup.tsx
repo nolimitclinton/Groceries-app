@@ -67,7 +67,7 @@ const SignupScreen = () => {
           <Text style={styles.subText}>Enter your credentials to continue</Text>
 
           <View style={styles.inputWrapper}>
-            <Text style={styles.label}>Full Name</Text>
+            <Text style={styles.label}>Username</Text>
             <TextInput
               style={styles.input}
               placeholder="Enter your full name"
@@ -153,13 +153,14 @@ const styles = StyleSheet.create({
     height: width * 0.12,
     resizeMode: "contain",
     alignSelf: "center",
-    marginBottom: height * 0.02,
+    marginBottom: height * 0.085,
   },
   title: {
     fontSize: width * 0.065,
     fontFamily: "Gilroy-Bold",
     color: "#000",
     marginBottom: height * 0.005,
+    paddingBottom: height * 0.01,
     textAlign: "left",
   },
   subText: {
@@ -229,12 +230,12 @@ const styles = StyleSheet.create({
   },
   loginContainer: {
     position: "absolute",
-    bottom: height * 0.05,
+    bottom: height * 0.13,
     width: "100%",
     alignItems: "center",
   },
   loginContainerActive: {
-    bottom: height * 0.39, 
+    bottom: height , 
   },
   loginText: {
     fontSize: width * 0.04,

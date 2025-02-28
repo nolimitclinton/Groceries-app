@@ -8,22 +8,20 @@ import {
   ImageBackground,
   Dimensions,
 } from "react-native";
+import { COLORS, FONTS, SIZES } from "assets/styles/theme";
+import { IMAGES } from "assets/images";
 
 const { width, height } = Dimensions.get("window");
 
-const WelcomeScreen= () => {
+const WelcomeScreen = () => {
   const router = useRouter();
 
   return (
-    <ImageBackground
-      source={require("assets/images/onboarding.png")}
-      style={styles.background}
-      resizeMode="cover"
-    >
+    <ImageBackground source={IMAGES.onboarding} style={styles.background} resizeMode="cover">
       <View style={styles.container}>
-       
+        {/* Text & Logo Section */}
         <View style={styles.textContainer}>
-          <Image source={require("assets/images/carrot-logo.png")} style={styles.logo} />
+          <Image source={IMAGES.carrotlogo} style={styles.logo} />
           <Text style={styles.title}>Welcome</Text>
           <Text style={styles.subtitle}>to our store</Text>
           <Text style={styles.description}>
@@ -31,7 +29,7 @@ const WelcomeScreen= () => {
           </Text>
         </View>
 
-        
+        {/* Button Section */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.button} onPress={() => router.push("/intro")}>
             <Text style={styles.buttonText}>Get Started</Text>
@@ -40,7 +38,7 @@ const WelcomeScreen= () => {
       </View>
     </ImageBackground>
   );
-}
+};
 
 const styles = StyleSheet.create({
   background: {
@@ -52,46 +50,44 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: height * 0.08, 
+    paddingVertical: height * 0.08,
   },
   textContainer: {
     alignItems: "center",
     justifyContent: "center",
-    marginTop: height * 0.46, 
+    marginTop: height * 0.46,
   },
   logo: {
-    width: width * 0.12, 
+    width: width * 0.12,
     height: height * 0.07,
     marginBottom: height * 0.01,
   },
   title: {
-    fontSize: width * 0.12,
-    fontFamily: "Gilroy-Bold",
+    fontSize: SIZES.big,
+    fontFamily: FONTS.normal,  
     textAlign: "center",
-    color: "#fff",
+    color: COLORS.bright,
   },
   subtitle: {
-    fontSize: width * 0.12,
-    fontFamily: "Gilroy-Bold",
-    color: "#fff",
+    fontSize: SIZES.big,
+    fontFamily: FONTS.normal,  
+    color: COLORS.bright,
   },
   description: {
-    fontSize: width * 0.04,
-    fontFamily: "Gilroy-Medium",
-    color: "#ddd",
+    fontSize: SIZES.body,
+    fontFamily: FONTS.medium,
+    color: COLORS.border,
     textAlign: "center",
-    marginTop: height * 0.01,
     width: "80%",
-    lineHeight: width * 0.05,
   },
   buttonContainer: {
     alignItems: "center",
     justifyContent: "flex-end",
     width: "100%",
-    paddingBottom: height * 0.05,
+    paddingBottom: height * 0.02,
   },
   button: {
-    backgroundColor: "#53B175",
+    backgroundColor: COLORS.primary, 
     borderRadius: width * 0.05,
     height: height * 0.08,
     width: width * 0.85,
@@ -99,10 +95,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   buttonText: {
-    fontFamily: "Gilroy-Regular",
-    color: "#fff",
-    fontSize: width * 0.05,
-    fontWeight: "bold",
+    color: COLORS.bright,
+    fontSize: SIZES.h2,
+    fontFamily: FONTS.normal,  
   },
 });
 

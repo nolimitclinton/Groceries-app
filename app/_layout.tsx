@@ -9,10 +9,10 @@ export default function Layout() {
   useEffect(() => {
     async function loadFonts() {
       await Font.loadAsync({
-        "Gilroy-Regular": require("../assets/fonts/Gilroy-Regular.ttf"),
-        "Gilroy-Medium": require("../assets/fonts/Gilroy-Medium.ttf"),
-        "Gilroy-Heavy": require("../assets/fonts/Gilroy-Heavy.ttf"),
-        "Gilroy-Bold": require("../assets/fonts/Gilroy-Bold.ttf"),
+        "Gilroy-Regular": require("../assets/styles/Gilroy-Regular.ttf"),
+        "Gilroy-Medium": require("../assets/styles/Gilroy-Medium.ttf"),
+        "Gilroy-Heavy": require("../assets/styles/Gilroy-Heavy.ttf"),
+        "Gilroy-Bold": require("../assets/styles/Gilroy-Bold.ttf"),
       });
       setFontsLoaded(true);
     }

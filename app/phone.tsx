@@ -5,12 +5,13 @@ import {
   TextInput,
   StyleSheet,
   Image,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
   Dimensions,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import BackgroundScreen from "../components/BackgroundScreen";
+import { COLORS, FONTS, SIZES } from "assets/styles/theme";
+import { IMAGES } from "assets/images";
 
 const { width, height } = Dimensions.get("window");
 
@@ -19,81 +20,75 @@ const PhoneScreen = () => {
 
   return (
     <BackgroundScreen onBack={() => router.back()} onNext={() => router.push("/otp")}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.container}
-      >
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <View style={styles.container}>
           <View style={styles.inputSection}>
             <Text style={styles.header}>Enter your mobile number</Text>
             <Text style={styles.subText}>Mobile Number</Text>
 
             <View style={styles.inputContainer}>
-              <Image source={require("assets/images/flag.png")} style={styles.flagIcon} />
+              <Image source={IMAGES.flag} style={styles.flagIcon} />
               <Text style={styles.countryCode}>+880</Text>
               <TextInput
                 style={styles.input}
                 keyboardType="phone-pad"
-                autoFocus={true}
-                placeholder="Enter your number"
-                placeholderTextColor="#999"
               />
             </View>
           </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+        </View>
+      </TouchableWithoutFeedback>
     </BackgroundScreen>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: "center",
-  },
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: "center",
-  },
-  inputSection: {
-    alignItems: "flex-start",
-    justifyContent: "flex-start",
     width: "100%",
   },
+  inputSection: {
+    width: "100%",
+    marginBottom: height * 0.47,
+  },
   header: {
-    fontSize: width * 0.06, 
-    fontFamily: "Gilroy-Bold",
+    fontSize: SIZES.h1,
+    fontFamily: FONTS.semiBold,  
+    color: COLORS.textDark,
     textAlign: "left",
-    bottom: height * 0.1,
+    marginBottom: height * 0.01,
+    paddingBottom: height * 0.02,
   },
   subText: {
-    fontSize: width * 0.04,
-    fontFamily: "Gilroy-Medium",
-    color: "#777",
+    fontSize: SIZES.body,
+    fontFamily: FONTS.medium,  
+    color: COLORS.textLight,
     marginBottom: height * 0.02,
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
     borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
-    paddingBottom: height * 0.02,
+    borderBottomColor: COLORS.border,
+    marginBottom: height * 0.1,
+    paddingBottom: height * 0.01,
     width: "100%",
   },
   flagIcon: {
-    width: width * 0.07,
+    width: width * 0.09,
     height: height * 0.03,
     marginRight: width * 0.02,
   },
   countryCode: {
-    fontSize: width * 0.05,
-    fontFamily: "Gilroy-Medium",
+    fontSize: SIZES.h3,
+    fontFamily: FONTS.medium,
     marginRight: width * 0.02,
+    color: COLORS.textDark,
   },
   input: {
     flex: 1,
-    fontSize: width * 0.05,
-    fontFamily: "Gilroy-Regular",
+    fontSize: SIZES.h3,
+    fontFamily: FONTS.regular,
+    color: COLORS.textDark,
+  
   },
 });
 

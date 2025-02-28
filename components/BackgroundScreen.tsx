@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   View,
   ImageBackground,
   StyleSheet,
   TouchableOpacity,
-  Keyboard,
-  Platform,
   Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -19,30 +17,6 @@ interface BackgroundScreenProps {
 }
 
 const BackgroundScreen: React.FC<BackgroundScreenProps> = ({ children, onBack, onNext }) => {
-  const [keyboardOffset, setKeyboardOffset] = useState(height * 0.3); 
-
-  useEffect(() => {
-    const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
-    const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
-
-    const keyboardDidShowListener = Keyboard.addListener(showEvent, (event) => {
-      setKeyboardOffset(
-        Platform.OS === "android" 
-          ? height * 0.03
-          : event.endCoordinates.height + height * 0.03
-      ); 
-    });
-
-    const keyboardDidHideListener = Keyboard.addListener(hideEvent, () => {
-      setKeyboardOffset(height * 0.3); 
-    });
-
-    return () => {
-      keyboardDidShowListener.remove();
-      keyboardDidHideListener.remove();
-    };
-  }, []);
-
   return (
     <ImageBackground
       source={require("assets/images/background.png")}
@@ -51,19 +25,20 @@ const BackgroundScreen: React.FC<BackgroundScreenProps> = ({ children, onBack, o
     >
       <View style={styles.overlay}>
 
+        {/* Back Button */}
         {onBack && (
           <TouchableOpacity style={styles.backButton} onPress={onBack}>
             <Ionicons name="chevron-back-outline" size={width * 0.06} color="black" />
           </TouchableOpacity>
         )}
 
-        {/* Content */}
+        {/* Injecting the screen content */}
         {children}
-        
 
+        {/* Next Button */}
         {onNext && (
           <TouchableOpacity
-            style={[styles.nextButton, { bottom: keyboardOffset }]}
+            style={styles.nextButton}
             onPress={onNext}
           >
             <Ionicons name="chevron-forward-outline" size={width * 0.08} color="white" />
@@ -76,7 +51,6 @@ const BackgroundScreen: React.FC<BackgroundScreenProps> = ({ children, onBack, o
 
 const styles = StyleSheet.create({
   background: {
-    flex: 1,
     width,
     height,
   },
@@ -87,13 +61,14 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: "absolute",
-    top: height * 0.1,
+    top: height * 0.07,
     left: width * 0.03,
     zIndex: 10,
   },
   nextButton: {
     position: "absolute",
-    right: width * 0.08,
+    right: width * 0.06,
+    bottom: height * 0.36,
     backgroundColor: "#53B175",
     width: width * 0.16,
     height: width * 0.16,
