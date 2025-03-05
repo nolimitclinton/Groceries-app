@@ -22,72 +22,85 @@ const LoginScreen = () => {
   const router = useRouter();
   const [form, setForm] = useState({ email: "", password: "" });
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
   const handleInputChange = (key: string, value: string) => {
     setForm({ ...form, [key]: value });
   };
 
   const handleLogin = () => {
-    if (!form.email || !form.password) {
-      alert("Please enter both email and password");
-      return;
-    }
+    // if (!form.email || !form.password) {
+    //   alert("Please enter both email and password");
+    //   return;
+    // }
     console.log("Logged In:", form);
-    router.push("/signup");
+    router.replace("/tabs/home"); 
   };
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener("keyboardDidShow", () => {
+      setKeyboardVisible(true);
+    });
+
+    const keyboardDidHideListener = Keyboard.addListener("keyboardDidHide", () => {
+      setKeyboardVisible(false);
+    });
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
 
   return (
     <ImageBackground source={IMAGES.background} style={styles.background} resizeMode="cover">
-      <View style={styles.container}>
-        <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
-          
-          <Image source={IMAGES.clogo} style={styles.logo} />
+      <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
+        <Image source={IMAGES.clogo} style={styles.logo} />
 
-          <Text style={styles.title}>Log In</Text>
-          <Text style={styles.subText}>Enter your email and password</Text>
+        <Text style={styles.title}>Log In</Text>
+        <Text style={styles.subText}>Enter your email and password</Text>
 
-          <View style={styles.inputWrapper}>
-            <Text style={styles.label}>Email</Text>
+        <View style={styles.inputWrapper}>
+          <Text style={styles.label}>Email</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your email"
+            placeholderTextColor={COLORS.textLight}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            value={form.email}
+            onChangeText={(text) => handleInputChange("email", text)}
+          />
+          <View style={styles.divider} />
+        </View>
+
+        <View style={styles.inputWrapper}>
+          <Text style={styles.label}>Password</Text>
+          <View style={styles.passwordContainer}>
             <TextInput
-              style={styles.input}
-              placeholder="Enter your email"
+              style={styles.passwordInput}
+              placeholder=""
               placeholderTextColor={COLORS.textLight}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              value={form.email}
-              onChangeText={(text) => handleInputChange("email", text)}
+              secureTextEntry={!passwordVisible}
+              value={form.password}
+              onChangeText={(text) => handleInputChange("password", text)}
             />
-            <View style={styles.divider} />
+            <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)} style={styles.eyeIcon}>
+              <Ionicons name={passwordVisible ? "eye-off" : "eye"} size={24} color={COLORS.textLight} />
+            </TouchableOpacity>
           </View>
+          <View style={styles.divider} />
+        </View>
 
-          <View style={styles.inputWrapper}>
-            <Text style={styles.label}>Password</Text>
-            <View style={styles.passwordContainer}>
-              <TextInput
-                style={styles.passwordInput}
-                placeholder=""
-                placeholderTextColor={COLORS.textLight}
-                secureTextEntry={!passwordVisible}
-                value={form.password}
-                onChangeText={(text) => handleInputChange("password", text)}
-              />
-              <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)} style={styles.eyeIcon}>
-                <Ionicons name={passwordVisible ? "eye-off" : "eye"} size={24} color={COLORS.textLight} />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.divider} />
-          </View>
+        <TouchableOpacity onPress={() => console.log("Forgot Password Pressed")}>
+          <Text style={styles.forgotPassword}>Forgot Password?</Text>
+        </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => console.log("Forgot Password Pressed")}>
-            <Text style={styles.forgotPassword}>Forgot Password?</Text>
-          </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          <Text style={styles.buttonText}>Log In</Text>
+        </TouchableOpacity>
 
-          <TouchableOpacity style={styles.button} onPress={handleLogin}>
-            <Text style={styles.buttonText}>Log In</Text>
-          </TouchableOpacity>
-        </ScrollView>
-
-        <View style={styles.signupContainer}>
+        <View style={[styles.signupContainer, isKeyboardVisible && styles.signupContainerActive]}>
           <Text style={styles.signupText}>
             Don't have an account?{" "}
             <Text style={styles.signupLink} onPress={() => router.push("/signup")}>
@@ -95,7 +108,7 @@ const LoginScreen = () => {
             </Text>
           </Text>
         </View>
-      </View>
+      </ScrollView>
     </ImageBackground>
   );
 };
@@ -106,13 +119,11 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-  container: {
-    flex: 1,
-  },
   scrollContainer: {
     flexGrow: 1,
     paddingHorizontal: width * 0.05,
     paddingTop: height * 0.1,
+    paddingBottom: height * 0.1, 
   },
   logo: {
     width: width * 0.12,
@@ -190,10 +201,12 @@ const styles = StyleSheet.create({
     color: COLORS.bright,
   },
   signupContainer: {
-    position: "absolute",
-    bottom: height * 0.30,
+    marginTop: height * 0.02,
     width: "100%",
     alignItems: "center",
+  },
+  signupContainerActive: {
+    marginBottom: height * 0.02, 
   },
   signupText: {
     fontSize: SIZES.body,

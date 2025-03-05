@@ -10,7 +10,6 @@ import {
   ImageBackground,
   Dimensions,
   Platform,
-  KeyboardAvoidingView,
   ScrollView,
   Keyboard,
 } from "react-native";
@@ -58,68 +57,68 @@ const SignupScreen = () => {
       style={styles.background}
       resizeMode="cover"
     >
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
-        <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
-          
-          <Image source={require("assets/images/carrotlogo.png")} style={styles.logo} />
+      <ScrollView 
+        contentContainerStyle={styles.scrollContainer} 
+        keyboardShouldPersistTaps="handled"
+      >
+        <Image source={require("assets/images/carrotlogo.png")} style={styles.logo} />
 
-          <Text style={styles.title}>Sign Up</Text>
-          <Text style={styles.subText}>Enter your credentials to continue</Text>
+        <Text style={styles.title}>Sign Up</Text>
+        <Text style={styles.subText}>Enter your credentials to continue</Text>
 
-          <View style={styles.inputWrapper}>
-            <Text style={styles.label}>Username</Text>
+        <View style={styles.inputWrapper}>
+          <Text style={styles.label}>Username</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your full name"
+            placeholderTextColor="#888"
+            value={form.name}
+            onChangeText={(text) => handleInputChange("name", text)}
+          />
+          <View style={styles.divider} />
+        </View>
+
+        <View style={styles.inputWrapper}>
+          <Text style={styles.label}>Email</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your email"
+            placeholderTextColor="#888"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            value={form.email}
+            onChangeText={(text) => handleInputChange("email", text)}
+          />
+          <View style={styles.divider} />
+        </View>
+
+        <View style={styles.inputWrapper}>
+          <Text style={styles.label}>Password</Text>
+          <View style={styles.passwordContainer}>
             <TextInput
-              style={styles.input}
-              placeholder="Enter your full name"
+              style={styles.passwordInput}
+              placeholder="********"
               placeholderTextColor="#888"
-              value={form.name}
-              onChangeText={(text) => handleInputChange("name", text)}
+              secureTextEntry={!passwordVisible}
+              value={form.password}
+              onChangeText={(text) => handleInputChange("password", text)}
             />
-            <View style={styles.divider} />
+            <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)} style={styles.eyeIcon}>
+              <Ionicons name={passwordVisible ? "eye-off" : "eye"} size={24} color="#888" />
+            </TouchableOpacity>
           </View>
+          <View style={styles.divider} />
+        </View>
 
-          <View style={styles.inputWrapper}>
-            <Text style={styles.label}>Email</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter your email"
-              placeholderTextColor="#888"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              value={form.email}
-              onChangeText={(text) => handleInputChange("email", text)}
-            />
-            <View style={styles.divider} />
-          </View>
+        <Text style={styles.termsText}>
+          By continuing, you agree to our{" "}
+          <Text style={styles.termsLink}>Terms of Service</Text> and{" "}
+          <Text style={styles.termsLink}>Privacy Policy</Text>.
+        </Text>
 
-          <View style={styles.inputWrapper}>
-            <Text style={styles.label}>Password</Text>
-            <View style={styles.passwordContainer}>
-              <TextInput
-                style={styles.passwordInput}
-                placeholder="********"
-                placeholderTextColor="#888"
-                secureTextEntry={!passwordVisible}
-                value={form.password}
-                onChangeText={(text) => handleInputChange("password", text)}
-              />
-              <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)} style={styles.eyeIcon}>
-                <Ionicons name={passwordVisible ? "eye-off" : "eye"} size={24} color="#888" />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.divider} />
-          </View>
-
-          <Text style={styles.termsText}>
-            By continuing, you agree to our{" "}
-            <Text style={styles.termsLink}>Terms of Service</Text> and{" "}
-            <Text style={styles.termsLink}>Privacy Policy</Text>.
-          </Text>
-
-          <TouchableOpacity style={styles.button} onPress={handleSignup}>
-            <Text style={styles.buttonText}>Sign Up</Text>
-          </TouchableOpacity>
-        </ScrollView>
+        <TouchableOpacity style={styles.button} onPress={handleSignup}>
+          <Text style={styles.buttonText}>Sign Up</Text>
+        </TouchableOpacity>
 
         <View style={[styles.loginContainer, isKeyboardVisible && styles.loginContainerActive]}>
           <Text style={styles.loginText}>
@@ -129,7 +128,7 @@ const SignupScreen = () => {
             </Text>
           </Text>
         </View>
-      </KeyboardAvoidingView>
+      </ScrollView>
     </ImageBackground>
   );
 };
@@ -140,13 +139,11 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-  container: {
-    flex: 1,
-  },
   scrollContainer: {
     flexGrow: 1,
     paddingHorizontal: width * 0.05,
     paddingTop: height * 0.1,
+    paddingBottom: height * 0.1, 
   },
   logo: {
     width: width * 0.12,
@@ -229,13 +226,12 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
   loginContainer: {
-    position: "absolute",
-    bottom: height * 0.13,
+    marginTop: height * 0.02,
     width: "100%",
     alignItems: "center",
   },
   loginContainerActive: {
-    bottom: height , 
+    marginBottom: height * 0.02, 
   },
   loginText: {
     fontSize: width * 0.04,

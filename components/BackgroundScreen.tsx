@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   ImageBackground,
   StyleSheet,
   TouchableOpacity,
   Dimensions,
+  Keyboard,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -17,6 +18,23 @@ interface BackgroundScreenProps {
 }
 
 const BackgroundScreen: React.FC<BackgroundScreenProps> = ({ children, onBack, onNext }) => {
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener("keyboardDidShow", () => {
+      setKeyboardVisible(true);
+    });
+
+    const keyboardDidHideListener = Keyboard.addListener("keyboardDidHide", () => {
+      setKeyboardVisible(false);
+    });
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
+
   return (
     <ImageBackground
       source={require("assets/images/background.png")}
@@ -32,13 +50,14 @@ const BackgroundScreen: React.FC<BackgroundScreenProps> = ({ children, onBack, o
           </TouchableOpacity>
         )}
 
-        {/* Injecting the screen content */}
         {children}
 
-        {/* Next Button */}
         {onNext && (
           <TouchableOpacity
-            style={styles.nextButton}
+            style={[
+              styles.nextButton,
+              { bottom: keyboardVisible ? height * 0.34 : height * 0.12 }, 
+            ]}
             onPress={onNext}
           >
             <Ionicons name="chevron-forward-outline" size={width * 0.08} color="white" />
@@ -68,7 +87,6 @@ const styles = StyleSheet.create({
   nextButton: {
     position: "absolute",
     right: width * 0.06,
-    bottom: height * 0.36,
     backgroundColor: "#53B175",
     width: width * 0.16,
     height: width * 0.16,

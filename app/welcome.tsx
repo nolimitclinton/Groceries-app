@@ -64,13 +64,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: SIZES.big,
-    fontFamily: FONTS.normal,  
+    fontFamily: FONTS.semiBold,  
     textAlign: "center",
     color: COLORS.bright,
   },
   subtitle: {
     fontSize: SIZES.big,
-    fontFamily: FONTS.normal,  
+    fontFamily: FONTS.semiBold,  
     color: COLORS.bright,
   },
   description: {
