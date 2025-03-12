@@ -19,7 +19,6 @@ const WelcomeScreen = () => {
   return (
     <ImageBackground source={IMAGES.onboarding} style={styles.background} resizeMode="cover">
       <View style={styles.container}>
-        {/* Text & Logo Section */}
         <View style={styles.textContainer}>
           <Image source={IMAGES.carrotlogo} style={styles.logo} />
           <Text style={styles.title}>Welcome</Text>
@@ -29,7 +28,6 @@ const WelcomeScreen = () => {
           </Text>
         </View>
 
-        {/* Button Section */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.button} onPress={() => router.push("/intro")}>
             <Text style={styles.buttonText}>Get Started</Text>

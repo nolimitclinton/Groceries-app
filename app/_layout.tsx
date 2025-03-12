@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { View, ActivityIndicator } from "react-native";
 import * as Font from "expo-font";
 import { Stack } from "expo-router";
+import { CartProvider } from "./cartContext";
 
 export default function Layout() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -30,10 +31,13 @@ export default function Layout() {
   }
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
+    <CartProvider>
+     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="welcome" />
       <Stack.Screen name="login" />
       <Stack.Screen name="(tabs)" /> 
-    </Stack>
+      <Stack.Screen name="placeorder" />
+     </Stack>
+    </CartProvider>
   );
 }

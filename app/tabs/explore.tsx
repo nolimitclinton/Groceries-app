@@ -8,6 +8,7 @@ import {
   ScrollView,
   Image,
   Dimensions,
+  SafeAreaView,
 } from "react-native";
 import { useRouter } from "expo-router"; 
 import { Ionicons } from "@expo/vector-icons";
@@ -44,7 +45,7 @@ const ExploreScreen = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Text style={styles.title}>Find Products</Text>
@@ -65,7 +66,7 @@ const ExploreScreen = () => {
           scrollEnabled={false}
         />
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -77,7 +78,7 @@ const styles = StyleSheet.create({
   scrollContainer: {
     paddingBottom: height * 0.1,
     paddingHorizontal: width * 0.05,
-    paddingTop: height * 0.05,
+    paddingTop: height * 0.03,
   },
   header: {
     alignItems: "center",

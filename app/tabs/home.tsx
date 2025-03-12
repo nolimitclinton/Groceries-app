@@ -9,26 +9,29 @@ import {
   FlatList,
   ScrollView,
   Dimensions,
+  SafeAreaView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS, FONTS, SIZES } from "assets/styles/theme";
-import { IMAGES } from "assets/images"; 
+import { IMAGES } from "assets/images";
+import { useCart } from "../cartContext"; 
 
 const { width, height } = Dimensions.get("window");
+const generateUniqueId = (prefix: string) => `${prefix}-${Date.now()}-${Math.random()}`;
 
 const bestSelling = [
-  { id: "1", name: "Red Pepper", price: "$4.99", image: IMAGES.redpepper },
-  { id: "2", name: "Ginger", price: "$4.99", image: IMAGES.ginger },
+  { id: "1", name: "Red Pepper", price: 4.99, image: IMAGES.redpepper },
+  { id: "2", name: "Ginger", price: 4.99, image: IMAGES.ginger },
 ];
 
 const groceries = [
-  { id: "3", name: "Beef Bone", price: "$4.99", image: IMAGES.beef },
-  { id: "4", name: "Broiler Chicken", price: "$4.99", image: IMAGES.chicken },
+  { id: "3", name: "Beef Bone", price: 4.99, image: IMAGES.beef },
+  { id: "4", name: "Broiler Chicken", price: 4.99, image: IMAGES.chicken },
 ];
 
 const exclusiveOffers = [
-  { id: "5", name: "Organic Bananas", price: "$4.99", image: IMAGES.banana },
-  { id: "6", name: "Red Apple", price: "$4.99", image: IMAGES.apple },
+  { id: "5", name: "Organic Bananas", price: 4.99, image: IMAGES.banana },
+  { id: "6", name: "Red Apple", price: 4.99, image: IMAGES.apple },
 ];
 
 const groceryCategories = [
@@ -38,21 +41,30 @@ const groceryCategories = [
 
 const HomeScreen = () => {
   const router = useRouter();
+  const { addToCart } = useCart(); 
 
-  const renderProduct = ({ item }: { item: { id: string; name: string; price: string; image: any } }) => (
-    <TouchableOpacity
-      style={styles.productContainer}
-      onPress={() => router.push(`/productdetail`)}
-    >
-      <Image source={item.image} style={styles.productImage} />
-      <Text style={styles.productName}>{item.name}</Text>
-      <Text style={styles.productWeight}>1kg, Price</Text>
-      <Text style={styles.productPrice}>{item.price}</Text>
+  const renderProduct = ({ item }: { item: { id: string; name: string; price: number; image: any } }) => (
+    <View style={styles.productContainer}>
+      <TouchableOpacity onPress={() => router.push(`/productdetail`)}>
+        <Image source={item.image} style={styles.productImage} />
+        <Text style={styles.productName}>{item.name}</Text>
+        <Text style={styles.productWeight}>1kg, Price</Text>
+        <Text style={styles.productPrice}>${item.price.toFixed(2)}</Text>
+      </TouchableOpacity>
 
-      <TouchableOpacity style={styles.plusButton}>
+      <TouchableOpacity
+        style={styles.plusButton}
+        onPress={() => addToCart({
+          id: generateUniqueId(item.name),
+          name: item.name,
+          description: "1kg, Price", 
+          price: item.price, 
+          image: item.image,
+          quantity: 1,
+        })}>
         <Image source={IMAGES.addButton} style={styles.plusIcon} />
       </TouchableOpacity>
-    </TouchableOpacity>
+    </View>
   );
 
   const renderCategory = ({ item }: { item: { id: string; name: string; image: any; backgroundColor: string } }) => (
@@ -63,7 +75,7 @@ const HomeScreen = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
         
         <Image source={IMAGES.clogo} style={styles.logo} />
@@ -132,7 +144,7 @@ const HomeScreen = () => {
           showsHorizontalScrollIndicator={false}
         />
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -140,19 +152,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.bright,
-    paddingHorizontal: width * 0.05,
-    paddingTop: height * 0.05,
   },
   scrollContainer: {
     flexGrow: 1,
     paddingBottom: height * 0.1,
+    paddingHorizontal: width * 0.05,
   },
   logo: {
     width: width * 0.12,
     height: width * 0.12,
     resizeMode: "contain",
     alignSelf: "center",
-    marginBottom: height * 0.02,
+    marginBottom: height * 0.01,
   },
   locationContainer: {
     flexDirection: "row",

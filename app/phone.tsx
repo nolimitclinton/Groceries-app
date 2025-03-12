@@ -19,7 +19,7 @@ const PhoneScreen = () => {
   const router = useRouter();
 
   return (
-    <BackgroundScreen onBack={() => router.back()} onNext={() => router.push("/otp")}>
+    <BackgroundScreen useImageBackground={true} onBack={() => router.back()} onNext={() => router.push("/otp")}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <View style={styles.container}>
           <View style={styles.inputSection}>

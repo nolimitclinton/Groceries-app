@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
-  ImageBackground,
   Dimensions,
   ScrollView,
   Keyboard,
@@ -15,6 +14,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS, FONTS, SIZES } from "assets/styles/theme";
 import { IMAGES } from "assets/images";
+import BackgroundScreen from "~/components/BackgroundScreen";
 
 const { width, height } = Dimensions.get("window");
 
@@ -53,7 +53,7 @@ const LoginScreen = () => {
   }, []);
 
   return (
-    <ImageBackground source={IMAGES.background} style={styles.background} resizeMode="cover">
+    <BackgroundScreen useImageBackground={true} buttonText="Log In" buttonPosition={0.285} onButtonPress={handleLogin}>
       <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
         <Image source={IMAGES.clogo} style={styles.logo} />
 
@@ -96,10 +96,6 @@ const LoginScreen = () => {
           <Text style={styles.forgotPassword}>Forgot Password?</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Log In</Text>
-        </TouchableOpacity>
-
         <View style={[styles.signupContainer, isKeyboardVisible && styles.signupContainerActive]}>
           <Text style={styles.signupText}>
             Don't have an account?{" "}
@@ -109,20 +105,15 @@ const LoginScreen = () => {
           </Text>
         </View>
       </ScrollView>
-    </ImageBackground>
+    </BackgroundScreen>
   );
 };
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    width: "100%",
-    height: "100%",
-  },
+  
   scrollContainer: {
     flexGrow: 1,
-    paddingHorizontal: width * 0.05,
-    paddingTop: height * 0.1,
+    paddingTop: height * 0.07,
     paddingBottom: height * 0.1, 
   },
   logo: {
@@ -185,23 +176,11 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.medium,
     color: COLORS.textDark,
     textAlign: "right",
-    marginBottom: height * 0.03,
+    marginBottom: height * 0.05,
   },
-  button: {
-    backgroundColor: COLORS.primary,
-    width: "100%",
-    paddingVertical: height * 0.02,
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  buttonText: {
-    fontSize: SIZES.h3,
-    fontFamily: FONTS.medium,
-    color: COLORS.bright,
-  },
+
   signupContainer: {
-    marginTop: height * 0.02,
+    marginTop: height * 0.09,
     width: "100%",
     alignItems: "center",
   },

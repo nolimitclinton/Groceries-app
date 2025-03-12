@@ -34,7 +34,7 @@ const OtpScreen = () => {
   }, []);
 
   return (
-    <BackgroundScreen onBack={() => router.back()} onNext={() => router.push("/location")}>
+    <BackgroundScreen useImageBackground={true} onBack={() => router.back()} onNext={() => router.push("/location")}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <View style={styles.container}>
           <View style={styles.inputSection}>
@@ -52,7 +52,7 @@ const OtpScreen = () => {
             />
           </View>
 
-          <View style={[styles.resendContainer, { bottom: keyboardVisible ? height * 0.22 : height * 0 }]}>
+          <View style={[styles.resendContainer, { bottom: keyboardVisible ? height * 0.28 : height * 0.06 }]}>
             <Text style={styles.resendText}>Resend Code</Text>
           </View>
         </View>

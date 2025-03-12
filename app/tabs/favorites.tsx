@@ -7,27 +7,37 @@ import {
   TouchableOpacity,
   Image,
   Dimensions,
+  SafeAreaView
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { COLORS, FONTS, SIZES } from "assets/styles/theme";
 import { IMAGES } from "assets/images";
+import { useCart } from "../cartContext"; 
 
 const { width, height } = Dimensions.get("window");
+const generateUniqueId = (prefix: string) => `${prefix}-${Date.now()}-${Math.random()}`;
 
 const favorites = [
-  { id: "1", name: "Sprite Can", description: "325ml, Price", price: "$1.50", image: IMAGES.sprite },
-  { id: "2", name: "Diet Coke", description: "355ml, Price", price: "$1.99", image: IMAGES.dietcoke },
-  { id: "3", name: "Apple & Grape Juice", description: "2L, Price", price: "$15.50", image: IMAGES.applegrape },
-  { id: "4", name: "Coca Cola Can", description: "325ml, Price", price: "$4.99", image: IMAGES.cocacola },
-  { id: "5", name: "Pepsi Can", description: "330ml, Price", price: "$4.99", image: IMAGES.pepsi },
+  { id: "1", name: "Sprite Can", description: "325ml, Price", price: 1.50, image: IMAGES.sprite },
+  { id: "2", name: "Diet Coke", description: "355ml, Price", price: 1.99, image: IMAGES.dietcoke },
+  { id: "3", name: "Apple & Grape Juice", description: "2L, Price", price: 15.50, image: IMAGES.applegrape },
+  { id: "4", name: "Coca Cola Can", description: "325ml, Price", price: 4.99, image: IMAGES.cocacola },
+  { id: "5", name: "Pepsi Can", description: "330ml, Price", price: 4.99, image: IMAGES.pepsi },
 ];
 
 const FavoritesScreen = () => {
   const router = useRouter();
+  const { addToCart } = useCart(); 
+
+  const handleAddAllToCart = () => {
+    favorites.forEach((item) => {
+      addToCart({ ...item, id: generateUniqueId(item.name),quantity: 1 }); 
+    });
+  };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Favourite</Text> 
@@ -43,7 +53,7 @@ const FavoritesScreen = () => {
                 <Text style={styles.productName}>{item.name}</Text>
                 <Text style={styles.productDescription}>{item.description}</Text>
               </View>
-              <Text style={styles.productPrice}>{item.price}</Text>
+              <Text style={styles.productPrice}>${item.price.toFixed(2)}</Text>
               <Ionicons name="chevron-forward-outline" size={20} color={COLORS.textGray} />
             </TouchableOpacity>
             <View style={styles.divider} />
@@ -53,10 +63,10 @@ const FavoritesScreen = () => {
         contentContainerStyle={styles.listContainer}
       />
 
-      <TouchableOpacity style={styles.addToCartButton}>
+      <TouchableOpacity style={styles.addToCartButton} onPress={handleAddAllToCart}>
         <Text style={styles.buttonText}>Add All To Cart</Text>
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -67,7 +77,7 @@ const styles = StyleSheet.create({
   },
   header: { 
     alignItems: "center",
-    paddingVertical: height * 0.06,
+    paddingVertical: height * 0.02,
     paddingHorizontal: width * 0.03,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,

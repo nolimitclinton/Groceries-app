@@ -19,6 +19,8 @@ export const COLORS = {
   bright: "#FFFFFF",
   lightgray: "#F2F3F2",
   star:"#F3603F",
+  buttonborder: "#E2E2E2",
+  checkoutprice: "#489E67",
 };
 
 export const FONTS = {
@@ -32,6 +34,7 @@ export const FONTS = {
 
 export const SIZES = {
   big: scaleFont(48),
+  h0: scaleFont(28),
   h1: scaleFont(26),
   h2: scaleFont(20),
   h3: scaleFont(18),
@@ -39,4 +42,6 @@ export const SIZES = {
   body: scaleFont(16),
   small: scaleFont(14),
   h5: scaleFont(13),
+  h6: scaleFont(12),
+  extrasmall: scaleFont(9),
 };

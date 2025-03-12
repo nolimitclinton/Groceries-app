@@ -1,38 +1,59 @@
 import { useRouter } from "expo-router";
-import { View, Text, TouchableOpacity, StyleSheet, Image, Dimensions } from "react-native";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  Dimensions,
+  Modal,
+  FlatList,
+} from "react-native";
 import BackgroundScreen from "../components/BackgroundScreen";
-import DropDownPicker from "react-native-dropdown-picker";
-import { useState } from "react";
 import { COLORS, FONTS, SIZES } from "assets/styles/theme";
 import { IMAGES } from "assets/images";
+import { Ionicons } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
+
+const zones = ["Lagos", "Port Harcourt", "Abuja", "Kaduna"];
+const areas = ["South West", "South South", "North Central", "North East"];
 
 const LocationScreen = () => {
   const router = useRouter();
 
-  const [openZone, setOpenZone] = useState(false);
-  const [selectedZone, setSelectedZone] = useState(null);
-  const [zones, setZones] = useState([
-    { label: "Lagos", value: "Lagos" },
-    { label: "Port Harcourt", value: "Port Harcourt" },
-    { label: "Abuja", value: "Abuja" },
-    { label: "Kaduna", value: "Kaduna" },
-  ]);
+  const [selectedZone, setSelectedZone] = useState<string | null>(null);
+  const [selectedArea, setSelectedArea] = useState<string | null>(null);
 
-  const [openArea, setOpenArea] = useState(false);
-  const [selectedArea, setSelectedArea] = useState(null);
-  const [areas, setAreas] = useState([
-    { label: "South West", value: "South West" },
-    { label: "South South", value: "South South" },
-    { label: "North Central", value: "North Central" },
-    { label: "North East", value: "North East" },
-  ]);
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [modalData, setModalData] = useState<string[]>([]);
+  const [modalType, setModalType] = useState<"zone" | "area">("zone");
+
+  const openModal = (type: "zone" | "area") => {
+    setModalData(type === "zone" ? zones : areas);
+    setModalType(type);
+    setModalVisible(true);
+  };
+
+  const selectItem = (item: string) => {
+    if (modalType === "zone") {
+      setSelectedZone(item);
+    } else {
+      setSelectedArea(item);
+    }
+    setModalVisible(false);
+  };
 
   return (
-    <BackgroundScreen onBack={() => router.back()}>
+    <BackgroundScreen
+      useImageBackground={true}
+      buttonText="Submit"
+      buttonPosition={0.08}
+      onButtonPress={() => router.push("/login")}
+      onBack={() => router.back()}
+    >
       <View style={styles.container}>
-        
         <Image source={IMAGES.location} style={styles.image} />
 
         <Text style={styles.header}>Select Your Location</Text>
@@ -40,42 +61,50 @@ const LocationScreen = () => {
           Switch on your location to stay in tune with what’s happening in your area
         </Text>
 
-        <View style={[styles.dropdownWrapper, { zIndex: openZone ? 2000 : 1 }]}>
+        <View style={styles.inputContainer}>
+     
           <Text style={styles.label}>Your Zone</Text>
-          <DropDownPicker
-            open={openZone}
-            value={selectedZone}
-            items={zones}
-            setOpen={setOpenZone}
-            setValue={setSelectedZone}
-            setItems={setZones}
-            placeholder="Select your zone"
-            style={styles.dropdown}
-            dropDownContainerStyle={styles.dropDownContainer}
-            textStyle={styles.dropDownText}
-          />
-        </View>
+          <TouchableOpacity style={styles.dropdown} onPress={() => openModal("zone")}>
+            <Text style={styles.dropdownText}>
+              {selectedZone ? selectedZone : "Select your zone"}
+            </Text>
+            <Ionicons name="chevron-down-outline" size={20} color={COLORS.textDark} />
+          </TouchableOpacity>
+          <View style={styles.divider} />
+          <View style={{ marginTop: height * 0.015 }} />
 
-        <View style={[styles.dropdownWrapper, { zIndex: openArea ? 2000 : 1 }]}>
           <Text style={styles.label}>Your Area</Text>
-          <DropDownPicker
-            open={openArea}
-            value={selectedArea}
-            items={areas}
-            setOpen={setOpenArea}
-            setValue={setSelectedArea}
-            setItems={setAreas}
-            placeholder="Select your area"
-            style={styles.dropdown}
-            dropDownContainerStyle={styles.dropDownContainer}
-            textStyle={styles.dropDownText}
-          />
+          <TouchableOpacity style={styles.dropdown} onPress={() => openModal("area")}>
+            <Text style={styles.dropdownText}>
+              {selectedArea ? selectedArea : "Types of your area"}
+            </Text>
+            <Ionicons name="chevron-down-outline" size={20} color={COLORS.textDark} />
+          </TouchableOpacity>
+          <View style={styles.divider} />
         </View>
-
-        <TouchableOpacity style={styles.button} onPress={() => router.push("/login")}>
-          <Text style={styles.buttonText}>Submit</Text>
-        </TouchableOpacity>
       </View>
+
+      <Modal transparent={true} visible={modalVisible}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>
+              {modalType === "zone" ? "Select Your Zone" : "Select Your Area"}
+            </Text>
+            <FlatList
+              data={modalData}
+              keyExtractor={(item) => item}
+              renderItem={({ item }) => (
+                <TouchableOpacity style={styles.modalItem} onPress={() => selectItem(item)}>
+                  <Text style={styles.modalItemText}>{item}</Text>
+                </TouchableOpacity>
+              )}
+            />
+            <TouchableOpacity style={styles.modalClose} onPress={() => setModalVisible(false)}>
+              <Text style={styles.modalCloseText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </BackgroundScreen>
   );
 };
@@ -83,7 +112,6 @@ const LocationScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
     alignItems: "center",
   },
   image: {
@@ -106,47 +134,75 @@ const styles = StyleSheet.create({
     color: COLORS.textGray,
     marginBottom: height * 0.03,
   },
-  dropdownWrapper: {
+  inputContainer: {
     width: "100%",
-    marginBottom: height * 0.03,
-    overflow: "visible", 
   },
   label: {
     fontSize: SIZES.body,
     fontFamily: FONTS.medium,
-    color: COLORS.gray,
+    color: COLORS.textGray,
     marginBottom: height * 0.005,
   },
   dropdown: {
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    borderRadius: 10,
-    backgroundColor: COLORS.bright,
-    height: height * 0.06,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
+    paddingVertical: height * 0.02,
   },
-  dropDownContainer: {
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    borderRadius: 10,
-    backgroundColor: COLORS.bright,
-  },
-  dropDownText: {
+  dropdownText: {
     fontSize: SIZES.body,
     fontFamily: FONTS.medium,
     color: COLORS.textDark,
   },
-  button: {
+  divider: {
+    width: "100%",
+    height: 1,
+    backgroundColor: COLORS.border,
+  },
+
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    width: "85%",
+    backgroundColor: COLORS.bright,
+    borderRadius: 10,
+    padding: width * 0.05,
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: SIZES.h2,
+    fontFamily: FONTS.bold,
+    color: COLORS.textDark,
+    marginBottom: height * 0.02,
+  },
+  modalItem: {
+    width: "100%",
+    paddingVertical: height * 0.015,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+    alignItems: "center",
+  },
+  modalItemText: {
+    fontSize: SIZES.body,
+    fontFamily: FONTS.medium,
+    color: COLORS.textDark,
+  },
+  modalClose: {
+    marginTop: height * 0.02,
+    padding: height * 0.015,
     backgroundColor: COLORS.primary,
-    paddingVertical: height * 0.02,
     borderRadius: 10,
     width: "100%",
     alignItems: "center",
-    marginTop: height * 0.02,
   },
-  buttonText: {
-    fontSize: SIZES.h3,
+  modalCloseText: {
+    fontSize: SIZES.body,
+    fontFamily: FONTS.bold,
     color: COLORS.bright,
-    fontFamily: FONTS.semiBold,
   },
 });
 

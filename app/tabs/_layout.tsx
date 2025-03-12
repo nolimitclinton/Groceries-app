@@ -1,22 +1,22 @@
-
-import { Ionicons } from "@expo/vector-icons";
+import { Tabs } from "expo-router";
+import { Image } from "react-native";
 import { COLORS } from "assets/styles/theme";
-import{Tabs} from "expo-router"
+import { IMAGES } from "assets/images"; 
 
 export default function BottomTabs() {
   return (
     <Tabs
       screenOptions={({ route }) => ({
-        tabBarIcon: ({ color, size }) => {
-          const icons: { [key: string]: keyof typeof Ionicons.glyphMap } = {
-            home: "storefront-outline",
-            explore: "search-outline",
-            cart: "cart-outline",
-            favorites: "heart-outline",
-            account: "person-outline",
+        tabBarIcon: ({ focused }) => {
+          const icons: { [key: string]: any } = {
+            home: focused ? IMAGES.shopActive : IMAGES.shopInactive,
+            explore: focused ? IMAGES.exploreActive : IMAGES.exploreInactive,
+            cart: focused ? IMAGES.cartActive : IMAGES.cartInactive,
+            favorites: focused ? IMAGES.favoriteActive : IMAGES.favoriteInactive,
+            account: focused ? IMAGES.accountActive : IMAGES.accountInactive,
           };
 
-          return <Ionicons name={icons[route.name]} size={size} color={color} />;
+          return <Image source={icons[route.name]} style={{ width: 24, height: 24, resizeMode: "contain" }} />;
         },
         tabBarActiveTintColor: COLORS.primary,
         tabBarInactiveTintColor: COLORS.textGray,
@@ -24,11 +24,11 @@ export default function BottomTabs() {
         headerShown: false,
       })}
     >
-      <Tabs.Screen name="home" options = {{title: "Shop"}}/>
-      <Tabs.Screen name="explore"options = {{title: "Explore"}}/>
-      <Tabs.Screen name="cart" options = {{title: "Cart"}}/>
-      <Tabs.Screen name="favorites" options = {{title: "Favorites"}} />
-      <Tabs.Screen name="account" options = {{title: "Account"}}/>
+      <Tabs.Screen name="home" options={{ title: "Shop" }} />
+      <Tabs.Screen name="explore" options={{ title: "Explore" }} />
+      <Tabs.Screen name="cart" options={{ title: "Cart" }} />
+      <Tabs.Screen name="favorites" options={{ title: "Favorites" }} />
+      <Tabs.Screen name="account" options={{ title: "Account" }} />
     </Tabs>
   );
 }

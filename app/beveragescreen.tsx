@@ -2,83 +2,79 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import {
   View,
   Text,
-  ScrollView,
   StyleSheet,
   TouchableOpacity,
   Image,
   Dimensions,
+  SafeAreaView,
+  ScrollView,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons"; 
+import BackgroundScreen from "~/components/BackgroundScreen"; 
 import { COLORS, FONTS, SIZES } from "assets/styles/theme";
 import { IMAGES } from "assets/images"; 
+import { useCart } from "./cartContext"; 
 
 const { width, height } = Dimensions.get("window");
+const generateUniqueId = (prefix: string) => `${prefix}-${Date.now()}-${Math.random()}`;
 
 const products = [
-  { id: "1", name: "Diet Coke", description: "355ml, Price", price: "$1.99", image: IMAGES.dietcoke },
-  { id: "2", name: "Sprite Can", description: "325ml, Price", price: "$1.50", image: IMAGES.sprite },
-  { id: "3", name: "Apple & Grape Juice", description: "2L, Price", price: "$15.99", image: IMAGES.applegrape },
-  { id: "4", name: "Orange Juice", description: "2L, Price", price: "$15.99", image: IMAGES.orangejuice },
-  { id: "5", name: "Coca Cola Can", description: "325ml, Price", price: "$4.99", image: IMAGES.cocacola },
-  { id: "6", name: "Pepsi Can", description: "330ml, Price", price: "$4.99", image: IMAGES.pepsi },
+  { id: "1", name: "Diet Coke", description: "355ml, Price", price: 1.99, image: IMAGES.dietcoke },
+  { id: "2", name: "Sprite Can", description: "325ml, Price", price: 1.50, image: IMAGES.sprite },
+  { id: "3", name: "Apple & Grape Juice", description: "2L, Price", price: 15.99, image: IMAGES.applegrape },
+  { id: "4", name: "Orange Juice", description: "2L, Price", price: 15.99, image: IMAGES.orangejuice },
+  { id: "5", name: "Coca Cola Can", description: "325ml, Price", price: 4.99, image: IMAGES.cocacola },
+  { id: "6", name: "Pepsi Can", description: "330ml, Price", price: 4.99, image: IMAGES.pepsi },
 ];
 
 const BeveragesScreen = () => {
   const router = useRouter();
+  const { addToCart } = useCart(); 
   const params = useLocalSearchParams();
   const category = params.category ? decodeURIComponent(params.category as string) : "Beverages";
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
-      
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.iconButton}>
-          <Ionicons name="chevron-back-outline" size={24} color={COLORS.textDark} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>{category}</Text>
-        <TouchableOpacity style={styles.iconButton}>
-          <Ionicons name="options-outline" size={24} color={COLORS.textDark} />
-        </TouchableOpacity>
-      </View>
+    <SafeAreaView style={styles.safeArea}>
+      <BackgroundScreen 
+        onBack={() => router.back()} 
+        headerButtonImage={IMAGES.filter} 
+        onHeaderButtonPress={() => console.log("Filter Clicked")}
+        headerText={category}
+      >
+        <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+          
+          <View style={styles.productsWrapper}>
+            {products.map((item, index) => (
+              <View key={item.id} style={[styles.productContainer, index % 2 !== 0 && { marginRight: 0 }]}>
+                <Image source={item.image} style={styles.productImage} />
+                <Text style={styles.productName}>{item.name}</Text>
+                <Text style={styles.productDescription}>{item.description}</Text>
 
-      <View style={styles.productsWrapper}>
-        {products.map((item) => (
-          <View key={item.id} style={styles.productContainer}>
-            <Image source={item.image} style={styles.productImage} />
-            <Text style={styles.productName}>{item.name}</Text>
-            <Text style={styles.productDescription}>{item.description}</Text>
-            <Text style={styles.productPrice}>{item.price}</Text>
-
-            <TouchableOpacity style={styles.plusButton}>
-              <Image source={IMAGES.addButton} style={styles.plusIcon} />
-            </TouchableOpacity>
+                <View style={styles.priceButtonContainer}>
+                  <Text style={styles.productPrice}>${item.price.toFixed(2)}</Text>
+                  <TouchableOpacity 
+                    style={styles.plusButton} 
+                    onPress={() => addToCart({ ...item, id: generateUniqueId(item.name),quantity: 1 })}
+                  >
+                    <Image source={IMAGES.addButton} style={styles.plusIcon} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ))}
           </View>
-        ))}
-      </View>
-    </ScrollView>
+        </ScrollView>
+      </BackgroundScreen>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: COLORS.bright, 
+  },
   scrollContainer: {
+    flexGrow: 1,
     paddingBottom: height * 0.1,
-    paddingHorizontal: width * 0.05,
-    paddingTop: height * 0.05,
-  },
-  header: { 
-    flexDirection: "row", 
-    justifyContent: "space-between", 
-    alignItems: "center",
-    paddingBottom: height * 0.02,
-  },
-  headerTitle: { 
-    fontSize: SIZES.h2, 
-    fontFamily: FONTS.bold, 
-    color: COLORS.textDark,
-  },
-  iconButton: {
-    padding: 10,
   },
   productsWrapper: {
     flexDirection: "row",
@@ -86,26 +82,27 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   productContainer: {
-    width: width * 0.43,
-    backgroundColor: COLORS.light,
+    width: width * 0.44, 
+    backgroundColor: COLORS.bright,
     borderRadius: 15,
-    padding: 19,
+    padding: width * 0.04, 
     marginBottom: height * 0.02,
-    alignItems: "center",
+    alignItems: "flex-start", 
     borderWidth: 1,
     borderColor: COLORS.border,
-    position: "relative", 
+    position: "relative",
   },
   productImage: { 
-    width: width * 0.3, 
-    height: width * 0.3, 
-    resizeMode: "contain" 
+    width: width * 0.35, 
+    height: width * 0.35, 
+    resizeMode: "contain",
+    alignSelf: "center",
   },
   productName: { 
     fontSize: SIZES.body, 
     fontFamily: FONTS.bold, 
-    textAlign: "left",
-    marginTop: 10, 
+    textAlign: "left", 
+    marginTop: 10,
   },
   productDescription: {
     fontSize: SIZES.small,
@@ -114,16 +111,19 @@ const styles = StyleSheet.create({
     textAlign: "left",
     marginTop: 5,
   },
+  priceButtonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+    marginTop: 5,
+  },
   productPrice: { 
     fontSize: SIZES.h3, 
     fontFamily: FONTS.semiBold, 
     color: COLORS.dark, 
-    marginTop: 5, 
   },
   plusButton: {
-    position: "absolute",
-    right: 12,
-    bottom: 12,
     width: 40,
     height: 40,
   },
