@@ -2,12 +2,23 @@ import React from "react";
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Dimensions } from "react-native";
 import { COLORS, FONTS, SIZES } from "assets/styles/theme";
 import { IMAGES } from "~/assets/images";
+import { logout } from "../authentication/authSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch } from "react-redux";
+import { useRouter } from "expo-router"; 
 
 const { width, height } = Dimensions.get("window");
 
 const AccountScreen = () => {
   const profileImageUri = "https://pbs.twimg.com/profile_images/1719429222320443393/I41tGdR8_400x400.jpg";
+  const dispatch = useDispatch();
+  const router = useRouter();
 
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem("token");     
+    dispatch(logout());                         
+    router.replace("/login");                   
+  };
   const options = [
     { id: "orders", label: "Orders", image: IMAGES.orders },
     { id: "details", label: "My Details", image: IMAGES.detailsicon },
@@ -41,7 +52,7 @@ const AccountScreen = () => {
           </View>
         ))}
 
-        <TouchableOpacity style={styles.logoutButton}>
+        <TouchableOpacity style={styles.logoutButton} activeOpacity={0.8} onPress={handleLogout}>
           <Image source={IMAGES.logout} style={styles.optionIcon} resizeMode="contain" />
           <Text style={styles.logoutText}>Log Out</Text>
         </TouchableOpacity>

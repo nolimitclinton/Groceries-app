@@ -20,7 +20,7 @@ export default function BottomTabs() {
         },
         tabBarActiveTintColor: COLORS.primary,
         tabBarInactiveTintColor: COLORS.textGray,
-        tabBarStyle: { backgroundColor: COLORS.bright, height: 60, paddingBottom: 10 },
+        tabBarStyle: { backgroundColor: COLORS.bright, height: 65, paddingBottom: 10 },
         headerShown: false,
       })}
     >

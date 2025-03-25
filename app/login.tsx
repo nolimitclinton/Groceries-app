@@ -15,6 +15,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { COLORS, FONTS, SIZES } from "assets/styles/theme";
 import { IMAGES } from "assets/images";
 import BackgroundScreen from "~/components/BackgroundScreen";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch } from "react-redux";
+import { loginSuccess, restoreSession } from "./authentication/authSlice";
 
 const { width, height } = Dimensions.get("window");
 
@@ -28,15 +31,50 @@ const LoginScreen = () => {
     setForm({ ...form, [key]: value });
   };
 
-  const handleLogin = () => {
-    // if (!form.email || !form.password) {
-    //   alert("Please enter both email and password");
-    //   return;
-    // }
-    console.log("Logged In:", form);
-    router.replace("/tabs/home"); 
-  };
+  const dispatch = useDispatch();
+  useEffect(() => {
+    const checkLogin = async () => {
+      const token = await AsyncStorage.getItem("token");
+      if (token) {
+        dispatch(restoreSession(token));
+        router.replace("/tabs/home");
+      }
+    };
+    checkLogin();
+  }, []);
 
+  const handleLogin = async () => {
+    try {
+      const response = await fetch("https://fakestoreapi.com/auth/login", {
+        method: "POST",
+        body: JSON.stringify({
+          username: form.email,
+          password: form.password,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error("Login failed");
+      }
+  
+      const data = await response.json();
+  
+      if (data.token) {
+        console.log("Token received:", data.token);
+        await AsyncStorage.setItem("token", data.token);
+        dispatch(loginSuccess(data.token));
+        router.replace("/tabs/home");
+      } else {
+        alert("Invalid credentials");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      alert("Login failed");
+    }
+  };
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener("keyboardDidShow", () => {
       setKeyboardVisible(true);
@@ -53,7 +91,7 @@ const LoginScreen = () => {
   }, []);
 
   return (
-    <BackgroundScreen useImageBackground={true} buttonText="Log In" buttonPosition={0.285} onButtonPress={handleLogin}>
+    <BackgroundScreen useImageBackground={true} buttonText="Log In" buttonPosition={0.24} onButtonPress={handleLogin}>
       <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
         <Image source={IMAGES.clogo} style={styles.logo} />
 

@@ -37,7 +37,7 @@ const ExploreScreen = () => {
   const renderCategory = ({ item }: { item: { id: string; name: string; image: any; backgroundColor: string; borderColor: string } }) => (
     <TouchableOpacity 
       style={[styles.categoryCard, { backgroundColor: item.backgroundColor, borderColor: item.borderColor }]}
-      onPress={() => handleCategoryPress(item.name)} 
+      onPress={() => handleCategoryPress(item.name)} activeOpacity={0.8}
     >
       <Image source={item.image} style={styles.categoryImage} />
       <Text style={styles.categoryName}>{item.name}</Text>

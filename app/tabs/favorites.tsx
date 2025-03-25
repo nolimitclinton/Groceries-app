@@ -47,7 +47,7 @@ const FavoritesScreen = () => {
         data={favorites}
         renderItem={({ item }) => (
           <>
-            <TouchableOpacity style={styles.favoriteItem}>
+            <TouchableOpacity style={styles.favoriteItem} activeOpacity={0.8}>
               <Image source={item.image} style={styles.productImage} />
               <View style={styles.productInfo}>
                 <Text style={styles.productName}>{item.name}</Text>
@@ -63,7 +63,7 @@ const FavoritesScreen = () => {
         contentContainerStyle={styles.listContainer}
       />
 
-      <TouchableOpacity style={styles.addToCartButton} onPress={handleAddAllToCart}>
+      <TouchableOpacity style={styles.addToCartButton} activeOpacity={0.8} onPress={handleAddAllToCart}>
         <Text style={styles.buttonText}>Add All To Cart</Text>
       </TouchableOpacity>
     </SafeAreaView>

@@ -5,7 +5,6 @@ import {
   Text,
   Image,
   TouchableOpacity,
-  ScrollView,
   StyleSheet,
   Dimensions,
 } from "react-native";
@@ -20,7 +19,7 @@ const { width, height } = Dimensions.get("window");
 const product = {
   id: "10",
   name: "Natural Red Apple",
-  description:"1kg, Price",
+  description: "1kg, Price",
   price: 4.99,
   image: IMAGES.apple,
   productdetail: "Apples Are Nutritious. Apples May Be Good For Weight Loss. Apples May Be Good For Your Heart. As Part Of A Healthful And Varied Diet.",
@@ -28,7 +27,7 @@ const product = {
 
 const ProductDetailScreen = () => {
   const router = useRouter();
-  const { addToCart, updateQuantity } = useCart(); 
+  const { addToCart } = useCart();
 
   const [quantity, setQuantity] = useState(1);
   const [totalPrice, setTotalPrice] = useState(product.price);
@@ -47,7 +46,6 @@ const ProductDetailScreen = () => {
     }
   };
 
-  
   const handleAddToCart = () => {
     addToCart({
       id: product.id,
@@ -59,123 +57,115 @@ const ProductDetailScreen = () => {
     });
     router.replace("/tabs/cart");
   };
+
   return (
-    <BackgroundScreen useImageBackground={false} buttonText="Add to Basket" onButtonPress={handleAddToCart} buttonPosition={0.05} onBack={() => router.back()} headerButtonImage={IMAGES.share} onHeaderButtonPress={() => console.log("Share Clicked")}
+    <BackgroundScreen
+      useImageBackground={false}
+      buttonText="Add to Basket"
+      onButtonPress={handleAddToCart}
+      buttonPosition={0.0}
+      onBack={() => router.back()}
+      headerButtonImage={IMAGES.share}
+      onHeaderButtonPress={() => console.log("Share Clicked")}
     >
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
-    <View style={styles.container}>
-      <View style={styles.header}>
-      </View>
+      
+      <View style={styles.imageContainer}>
+        <Image source={product.image} style={styles.productImage} />
+        </View>
 
-      <Image source={product.image} style={styles.productImage} />
+        <View style={styles.container}>
+        <View style={styles.productHeader}>
+          <Text style={styles.productName}>{product.name}</Text>
+          <TouchableOpacity style={styles.favoriteIcon}>
+            <Ionicons name="heart-outline" size={28} color={COLORS.textGray} />
+          </TouchableOpacity>
+        </View>
+        <Text style={styles.productDescription}>{product.description}</Text>
 
-      <View style={styles.productHeader}>
-        <Text style={styles.productName}>{product.name}</Text>
-        <TouchableOpacity style={styles.favoriteIcon}>
-          <Ionicons name="heart-outline" size={28} color={COLORS.textGray} />
+        <View style={styles.quantityPriceContainer}>
+          <View style={styles.quantityContainer}>
+            <TouchableOpacity style={styles.quantityButton} onPress={() => handleQuantityChange("decrease")}>
+              <Ionicons name="remove-outline" size={25} color={COLORS.textGray} />
+            </TouchableOpacity>
+            <View style={styles.quantityBox}>
+              <Text style={styles.quantityText}>{quantity}</Text>
+            </View>
+            <TouchableOpacity style={styles.quantityButton} onPress={() => handleQuantityChange("increase")}>
+              <Ionicons name="add-outline" size={25} color={COLORS.primary} />
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.productPrice}>${totalPrice.toFixed(2)}</Text>
+        </View>
+
+        <View style={styles.divider} />
+        <TouchableOpacity style={styles.sectionHeader} onPress={() => setShowDetails(!showDetails)}>
+          <Text style={styles.sectionTitle}>Product Detail</Text>
+          <Ionicons
+            name={showDetails ? "chevron-down-outline" : "chevron-forward-outline"}
+            size={20}
+            color={COLORS.textDark}
+          />
+        </TouchableOpacity>
+        {showDetails && <Text style={styles.productdetail}>{product.productdetail}</Text>}
+
+        <View style={styles.divider} />
+        <TouchableOpacity style={styles.sectionHeader} onPress={() => setShowNutrition(!showNutrition)}>
+          <View style={styles.rowContainer}>
+            <Text style={styles.sectionTitle}>Nutritions</Text>
+            <View style={styles.nutritionBox}>
+              <Text style={styles.nutritionText}>100gr</Text>
+            </View>
+            <Ionicons
+              name={showNutrition ? "chevron-forward-outline" : "chevron-down-outline"}
+              size={20}
+              color={COLORS.textDark}
+            />
+          </View>
+        </TouchableOpacity>
+
+        <View style={styles.divider} />
+        <TouchableOpacity style={styles.sectionHeader} onPress={() => setShowReview(!showReview)}>
+          <View style={styles.rowContainer}>
+            <Text style={styles.sectionTitle}>Review</Text>
+            <View style={styles.starContainer}>
+              {[...Array(5)].map((_, index) => (
+                <Ionicons key={index} name="star" size={20} color={COLORS.star} />
+              ))}
+            </View>
+            <Ionicons
+              name={showReview ? "chevron-forward-outline" : "chevron-down-outline"}
+              size={20}
+              color={COLORS.textDark}
+            />
+          </View>
         </TouchableOpacity>
       </View>
-      <Text style={styles.productDescription}>{product.description}</Text>
-      <View style={styles.quantityPriceContainer}>
-        <View style={styles.quantityContainer}>
-          <TouchableOpacity style={styles.quantityButton} onPress={() => handleQuantityChange("decrease")}>
-            <Ionicons name="remove-outline" size={25} color={COLORS.textGray} />
-          </TouchableOpacity>
-          <View style={styles.quantityBox}>
-                <Text style={styles.quantityText}>{quantity}</Text>
-              </View>
-          <TouchableOpacity style={styles.quantityButton}onPress={() => handleQuantityChange("increase")}
-              >
-            <Ionicons name="add-outline" size={25} color={COLORS.primary} />
-          </TouchableOpacity>
-        </View>
-        <Text style={styles.productPrice}>${totalPrice.toFixed(2)}</Text>
-      </View>
-
-      <View style={styles.divider} />
-      <TouchableOpacity
-        style={styles.sectionHeader}
-        onPress={() => setShowDetails(!showDetails)}
-      >
-        <Text style={styles.sectionTitle}>Product Detail</Text>
-        <Ionicons
-          name={showDetails ? "chevron-down-outline" : "chevron-forward-outline"}
-          size={20}
-          color={COLORS.textDark}
-        />
-      </TouchableOpacity>
-      {showDetails && <Text style={styles.productdetail}>{product.productdetail}</Text>}
-      
-      <View style={styles.divider} />
-      <TouchableOpacity
-        style={styles.sectionHeader}
-        onPress={() => setShowNutrition(!showNutrition)}
-      >
-        <View style={styles.rowContainer}>
-          <Text style={styles.sectionTitle}>Nutritions</Text>
-          <View style={styles.nutritionBox}>
-            <Text style={styles.nutritionText}>100gr</Text>
-          </View>
-          <Ionicons
-            name={showNutrition ? "chevron-forward-outline" : "chevron-down-outline"}
-            size={20}
-            color={COLORS.textDark}
-          />
-        </View>
-      </TouchableOpacity>
-      
-
-       <View style={styles.divider} />
-       <TouchableOpacity
-        style={styles.sectionHeader}
-        onPress={() => setShowReview(!showReview)}
-      >
-        <View style={styles.rowContainer}>
-          <Text style={styles.sectionTitle}>Review</Text>
-          <View style={styles.starContainer}>
-            {[...Array(5)].map((_, index) => (
-              <Ionicons key={index} name="star" size={20} color={COLORS.star} />
-            ))}
-          </View>
-          <Ionicons
-            name={showReview ? "chevron-forward-outline" : "chevron-down-outline"}
-            size={20}
-            color={COLORS.textDark}
-          />
-        </View>
-      </TouchableOpacity>
-
-      
-    </View>
-    </ScrollView>
-  </BackgroundScreen>
+    </BackgroundScreen>
   );
 };
 
 const styles = StyleSheet.create({
-  scrollContainer: {
-    flexGrow: 1,
+  imageContainer: {
+    position: "absolute",
+    top: 0,
+    width: width,
+    height: height * 0.4, 
+    backgroundColor: COLORS.lightgray, 
+    justifyContent: "center",
+    alignItems: "center",
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+  },
+  productImage: {
+    width: width * 0.8,
+    height: height * 0.35,
+    resizeMode: "contain",
   },
   container: {
     flex: 1,
     backgroundColor: COLORS.bright,
-    alignItems: "center",
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-    //marginTop: height * 0.05,
-  },
-  iconButton: {
-    marginLeft: height * 0.36,
-    //marginBottom: height * 0,
-  },
-  productImage: {
-    width: width * 0.5,
-    height: width * 0.5,
-    resizeMode: "contain",
-    //marginTop: height * 0.02,
+    marginTop: height * 0.38,
+    paddingHorizontal: width * 0.01,
   },
   productHeader: {
     flexDirection: "row",
@@ -190,6 +180,13 @@ const styles = StyleSheet.create({
   },
   favoriteIcon: {
     padding: 10,
+  },
+  productDescription: {
+    fontSize: SIZES.body,
+    fontFamily: FONTS.medium,
+    textAlign: "left",
+    width: "100%",
+    color: COLORS.textGray,
   },
   quantityPriceContainer: {
     flexDirection: "row",
@@ -249,13 +246,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     width: "100%",
   },
-  productDescription: {
-    fontSize: SIZES.body,
-    fontFamily: FONTS.medium,
-    textAlign: "left",
-    width: "100%",
-    color: COLORS.textGray,
-  },
   productdetail: {
     fontSize: SIZES.h5,
     fontFamily: FONTS.medium,
@@ -284,7 +274,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginLeft: 170,
   },
- 
 });
 
 export default ProductDetailScreen;

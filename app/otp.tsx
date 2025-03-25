@@ -52,7 +52,7 @@ const OtpScreen = () => {
             />
           </View>
 
-          <View style={[styles.resendContainer, { bottom: keyboardVisible ? height * 0.28 : height * 0.06 }]}>
+          <View style={[styles.resendContainer, { bottom: keyboardVisible ? height * 0.24 : height * 0 }]}>
             <Text style={styles.resendText}>Resend Code</Text>
           </View>
         </View>
@@ -64,6 +64,7 @@ const OtpScreen = () => {
 const styles = StyleSheet.create({
   container: {
     width: "100%",
+    marginTop: height * 0.15,
   },
   inputSection: {
     alignItems: "flex-start",

@@ -45,7 +45,7 @@ const HomeScreen = () => {
 
   const renderProduct = ({ item }: { item: { id: string; name: string; price: number; image: any } }) => (
     <View style={styles.productContainer}>
-      <TouchableOpacity onPress={() => router.push(`/productdetail`)}>
+      <TouchableOpacity onPress={() => router.push(`/productdetail`)} activeOpacity={0.8}>
         <Image source={item.image} style={styles.productImage} />
         <Text style={styles.productName}>{item.name}</Text>
         <Text style={styles.productWeight}>1kg, Price</Text>
@@ -53,7 +53,7 @@ const HomeScreen = () => {
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={styles.plusButton}
+        style={styles.plusButton} activeOpacity={0.8}
         onPress={() => addToCart({
           id: generateUniqueId(item.name),
           name: item.name,
@@ -68,7 +68,7 @@ const HomeScreen = () => {
   );
 
   const renderCategory = ({ item }: { item: { id: string; name: string; image: any; backgroundColor: string } }) => (
-    <TouchableOpacity style={[styles.categoryCard, { backgroundColor: item.backgroundColor }]}>
+    <TouchableOpacity style={[styles.categoryCard, { backgroundColor: item.backgroundColor }]}activeOpacity={0.8}>
       <Image source={item.image} style={styles.categoryImage} />
       <Text style={styles.categoryName}>{item.name}</Text>
     </TouchableOpacity>

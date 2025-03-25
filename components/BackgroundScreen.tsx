@@ -23,7 +23,7 @@ interface BackgroundScreenProps {
   onNext?: () => void;
   buttonText?: string;
   onButtonPress?: () => void;
-  buttonPosition?: number; 
+  buttonPosition?: number;
   headerButtonImage?: any;
   onHeaderButtonPress?: () => void;
   headerText?: string;
@@ -36,7 +36,7 @@ const BackgroundScreen: React.FC<BackgroundScreenProps> = ({
   onNext,
   buttonText,
   onButtonPress,
-  buttonPosition, 
+  buttonPosition,
   headerButtonImage,
   onHeaderButtonPress,
   headerText,
@@ -70,6 +70,7 @@ const BackgroundScreen: React.FC<BackgroundScreenProps> = ({
     >
       {hasFlatList ? (
         <View style={styles.overlay}>
+    
           <View style={styles.headerContainer}>
             {onBack && (
               <TouchableOpacity style={styles.backButton} onPress={onBack}>
@@ -104,6 +105,7 @@ const BackgroundScreen: React.FC<BackgroundScreenProps> = ({
                 { bottom: buttonPosition !== undefined ? height * buttonPosition : height * 0.03 },
               ]}
               onPress={onButtonPress}
+              activeOpacity={0.8}
             >
               <Text style={styles.buttonText}>{buttonText}</Text>
             </TouchableOpacity>
@@ -112,6 +114,7 @@ const BackgroundScreen: React.FC<BackgroundScreenProps> = ({
       ) : (
         <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
           <View style={styles.overlay}>
+         
             <View style={styles.headerContainer}>
               {onBack && (
                 <TouchableOpacity style={styles.backButton} onPress={onBack}>
@@ -120,7 +123,6 @@ const BackgroundScreen: React.FC<BackgroundScreenProps> = ({
               )}
 
               {headerText && <Text style={styles.headerText}>{headerText}</Text>}
-
               {headerButtonImage && onHeaderButtonPress && (
                 <TouchableOpacity style={styles.headerButton} onPress={onHeaderButtonPress}>
                   <Image source={headerButtonImage} style={styles.headerButtonImage} />
@@ -132,7 +134,7 @@ const BackgroundScreen: React.FC<BackgroundScreenProps> = ({
 
             {onNext && (
               <TouchableOpacity
-                style={[styles.nextButton, { bottom: keyboardVisible ? height * 0.34 : height * 0.12 }]}
+                style={[styles.nextButton, { bottom: keyboardVisible ? height * 0.26 : height * 0.01 }]}
                 onPress={onNext}
               >
                 <Ionicons name="chevron-forward-outline" size={width * 0.08} color="white" />
@@ -164,7 +166,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
-    paddingBottom: height * 0.01,
+    paddingBottom: height * 0.1,
   },
   overlay: {
     flex: 1,
@@ -172,15 +174,38 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   headerContainer: {
+    position: "absolute",
+    top: height * 0.09, 
+    left: 0,
+    right: 0,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    width: "100%",
-    paddingTop: height * 0.02,
-    paddingBottom: height * 0.02,
+    paddingHorizontal: width * 0.05,
   },
   backButton: {
-    padding: 10,
+    position: "absolute",
+    left: width * 0.04,
+    zIndex: 1,
+  },
+  headerText: {
+    position: "absolute",
+    left: width * 0.25,
+    fontSize: SIZES.h2,
+    fontFamily: FONTS.bold,
+    color: COLORS.textDark,
+    textAlign: "center",
+    zIndex: 1,
+  },
+  headerButton: {
+    position: "absolute",
+    right: width * 0.05,
+    zIndex: 1,
+  },
+  headerButtonImage: {
+    width: width * 0.06,
+    height: width * 0.06,
+    resizeMode: "contain",
   },
   nextButton: {
     position: "absolute",
@@ -191,21 +216,6 @@ const styles = StyleSheet.create({
     borderRadius: width * 0.08,
     justifyContent: "center",
     alignItems: "center",
-  },
-  headerButton: {
-    padding: 10,
-  },
-  headerButtonImage: {
-    width: width * 0.06,
-    height: width * 0.06,
-    resizeMode: "contain",
-  },
-  headerText: {
-    fontSize: SIZES.h2,
-    fontFamily: FONTS.bold,
-    color: COLORS.textDark,
-    textAlign: "center",
-    flex: 1,
   },
   horizontalButton: {
     position: "absolute",

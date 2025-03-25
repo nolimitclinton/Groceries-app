@@ -49,7 +49,7 @@ const LocationScreen = () => {
     <BackgroundScreen
       useImageBackground={true}
       buttonText="Submit"
-      buttonPosition={0.08}
+      buttonPosition={0.0}
       onButtonPress={() => router.push("/login")}
       onBack={() => router.back()}
     >
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: width * 0.6,
-    height: height * 0.25,
+    height: height * 0.45,
     resizeMode: "contain",
     marginBottom: height * 0.03,
   },

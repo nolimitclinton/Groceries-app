@@ -44,6 +44,7 @@ const PhoneScreen = () => {
 const styles = StyleSheet.create({
   container: {
     width: "100%",
+    marginTop: height * 0.15,
   },
   inputSection: {
     width: "100%",

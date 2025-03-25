@@ -83,7 +83,7 @@ const CartScreen = () => {
       />
 
       <View style={styles.checkoutButtonContainer}>
-        <TouchableOpacity style={styles.checkoutButton} onPress={() => setCheckoutVisible(true)}>
+        <TouchableOpacity style={styles.checkoutButton} activeOpacity={0.8} onPress={() => setCheckoutVisible(true)}>
           <Text style={styles.checkoutText}>Go to Checkout</Text>
           <View style={styles.totalCostBadge}>
             <Text style={styles.checkoutPrice}>${totalCost.toFixed(2)}</Text>
