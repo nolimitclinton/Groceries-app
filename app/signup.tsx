@@ -7,14 +7,14 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
-  ImageBackground,
   Dimensions,
-  Platform,
-  KeyboardAvoidingView,
   ScrollView,
   Keyboard,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { COLORS, FONTS, SIZES } from "assets/styles/theme";
+import { IMAGES } from "assets/images";
+import BackgroundScreen from "~/components/BackgroundScreen";
 
 const { width, height } = Dimensions.get("window");
 
@@ -53,73 +53,63 @@ const SignupScreen = () => {
   }, []);
 
   return (
-    <ImageBackground
-      source={require("assets/images/background.png")}
-      style={styles.background}
-      resizeMode="cover"
-    >
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
-        <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
-          
-          <Image source={require("assets/images/carrotlogo.png")} style={styles.logo} />
+    <BackgroundScreen useImageBackground={true} buttonText="Sign Up" onButtonPress={handleSignup} buttonPosition={0.173}>
+      <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
+        <Image source={IMAGES.clogo}style={styles.logo} />
 
-          <Text style={styles.title}>Sign Up</Text>
-          <Text style={styles.subText}>Enter your credentials to continue</Text>
+        <Text style={styles.title}>Sign Up</Text>
+        <Text style={styles.subText}>Enter your credentials to continue</Text>
 
-          <View style={styles.inputWrapper}>
-            <Text style={styles.label}>Username</Text>
+        <View style={styles.inputWrapper}>
+          <Text style={styles.label}>Username</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your full name"
+            placeholderTextColor={COLORS.textGray}
+            value={form.name}
+            onChangeText={(text) => handleInputChange("name", text)}
+          />
+          <View style={styles.divider} />
+        </View>
+
+        <View style={styles.inputWrapper}>
+          <Text style={styles.label}>Email</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your email"
+            placeholderTextColor={COLORS.textGray}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            value={form.email}
+            onChangeText={(text) => handleInputChange("email", text)}
+          />
+          <View style={styles.divider} />
+        </View>
+
+        <View style={styles.inputWrapper}>
+          <Text style={styles.label}>Password</Text>
+          <View style={styles.passwordContainer}>
             <TextInput
-              style={styles.input}
-              placeholder="Enter your full name"
-              placeholderTextColor="#888"
-              value={form.name}
-              onChangeText={(text) => handleInputChange("name", text)}
+              style={styles.passwordInput}
+              placeholder="********"
+              placeholderTextColor={COLORS.textGray}
+              secureTextEntry={!passwordVisible}
+              value={form.password}
+              onChangeText={(text) => handleInputChange("password", text)}
             />
-            <View style={styles.divider} />
+            <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)} style={styles.eyeIcon}>
+              <Ionicons name={passwordVisible ? "eye-off" : "eye"} size={24} color={COLORS.textGray} />
+            </TouchableOpacity>
           </View>
+          <View style={styles.divider} />
+        </View>
 
-          <View style={styles.inputWrapper}>
-            <Text style={styles.label}>Email</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter your email"
-              placeholderTextColor="#888"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              value={form.email}
-              onChangeText={(text) => handleInputChange("email", text)}
-            />
-            <View style={styles.divider} />
-          </View>
+        <Text style={styles.termsText}>
+          By continuing, you agree to our{" "}
+          <Text style={styles.termsLink}>Terms of Service</Text> and{" "}
+          <Text style={styles.termsLink}>Privacy Policy</Text>.
+        </Text>
 
-          <View style={styles.inputWrapper}>
-            <Text style={styles.label}>Password</Text>
-            <View style={styles.passwordContainer}>
-              <TextInput
-                style={styles.passwordInput}
-                placeholder="********"
-                placeholderTextColor="#888"
-                secureTextEntry={!passwordVisible}
-                value={form.password}
-                onChangeText={(text) => handleInputChange("password", text)}
-              />
-              <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)} style={styles.eyeIcon}>
-                <Ionicons name={passwordVisible ? "eye-off" : "eye"} size={24} color="#888" />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.divider} />
-          </View>
-
-          <Text style={styles.termsText}>
-            By continuing, you agree to our{" "}
-            <Text style={styles.termsLink}>Terms of Service</Text> and{" "}
-            <Text style={styles.termsLink}>Privacy Policy</Text>.
-          </Text>
-
-          <TouchableOpacity style={styles.button} onPress={handleSignup}>
-            <Text style={styles.buttonText}>Sign Up</Text>
-          </TouchableOpacity>
-        </ScrollView>
 
         <View style={[styles.loginContainer, isKeyboardVisible && styles.loginContainerActive]}>
           <Text style={styles.loginText}>
@@ -129,44 +119,37 @@ const SignupScreen = () => {
             </Text>
           </Text>
         </View>
-      </KeyboardAvoidingView>
-    </ImageBackground>
+      </ScrollView>
+    </BackgroundScreen>
   );
 };
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    width: "100%",
-    height: "100%",
-  },
-  container: {
-    flex: 1,
-  },
+  
   scrollContainer: {
     flexGrow: 1,
-    paddingHorizontal: width * 0.05,
-    paddingTop: height * 0.1,
+    paddingTop: height * 0.07,
+    paddingBottom: height * 0.1, 
   },
   logo: {
     width: width * 0.12,
     height: width * 0.12,
     resizeMode: "contain",
     alignSelf: "center",
-    marginBottom: height * 0.085,
+    marginBottom: height * 0.08,
   },
   title: {
-    fontSize: width * 0.065,
-    fontFamily: "Gilroy-Bold",
-    color: "#000",
+    fontSize: SIZES.h1,
+    fontFamily: FONTS.bold,
+    color: COLORS.dark,
     marginBottom: height * 0.005,
     paddingBottom: height * 0.01,
     textAlign: "left",
   },
   subText: {
-    fontSize: width * 0.04,
-    fontFamily: "Gilroy-Regular",
-    color: "#777",
+    fontSize: SIZES.body,
+    fontFamily: FONTS.regular,
+    color: COLORS.textLight,
     marginBottom: height * 0.03,
     textAlign: "left",
   },
@@ -174,78 +157,62 @@ const styles = StyleSheet.create({
     marginBottom: height * 0.02,
   },
   label: {
-    fontSize: width * 0.04,
-    fontFamily: "Gilroy-Medium",
-    color: "#777",
+    fontSize: SIZES.body,
+    fontFamily: FONTS.regular,
+    color: COLORS.textLight,
     marginBottom: height * 0.005,
   },
   input: {
     width: "100%",
     height: height * 0.06,
     fontSize: width * 0.045,
-    backgroundColor: "transparent",
   },
   divider: {
     height: 1,
     width: "100%",
-    backgroundColor: "#ddd",
+    backgroundColor: COLORS.border,
   },
   passwordContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "transparent",
   },
   passwordInput: {
     flex: 1,
     height: height * 0.06,
-    fontSize: width * 0.045,
+    fontSize: SIZES.h3,
   },
   eyeIcon: {
-    padding: 10,
+    padding: 1,
   },
   termsText: {
-    fontSize: width * 0.035,
-    fontFamily: "Gilroy-Medium",
-    color: "#777",
+    fontSize: SIZES.small,
+    fontFamily: FONTS.medium,
+    color: COLORS.textLight,
     textAlign: "left",
-    marginTop: height * 0.01,
     marginBottom: height * 0.03,
   },
   termsLink: {
-    color: "#53B175",
-    fontFamily: "Gilroy-Bold",
+    color: COLORS.primary,
+    fontFamily: FONTS.bold,
   },
-  button: {
-    backgroundColor: "#53B175",
-    width: "100%",
-    paddingVertical: height * 0.02,
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  buttonText: {
-    fontSize: width * 0.05,
-    fontFamily: "Gilroy-Medium",
-    color: "#fff",
-  },
+ 
   loginContainer: {
-    position: "absolute",
-    bottom: height * 0.13,
+    marginTop: height * 0.12,
     width: "100%",
     alignItems: "center",
   },
   loginContainerActive: {
-    bottom: height , 
+    marginBottom: height * 0.02, 
   },
   loginText: {
-    fontSize: width * 0.04,
-    fontFamily: "Gilroy-Regular",
-    color: "#555",
+    fontSize: SIZES.small,
+    fontFamily: FONTS.regular,
+    color: COLORS.textLight,
     textAlign: "center",
   },
   loginLink: {
-    color: "#53B175",
-    fontFamily: "Gilroy-Bold",
+    color: COLORS.primary,
+    fontFamily: FONTS.bold,
   },
 });
 

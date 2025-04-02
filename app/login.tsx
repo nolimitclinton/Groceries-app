@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
-  ImageBackground,
   Dimensions,
   ScrollView,
   Keyboard,
@@ -15,6 +14,10 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS, FONTS, SIZES } from "assets/styles/theme";
 import { IMAGES } from "assets/images";
+import BackgroundScreen from "~/components/BackgroundScreen";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch } from "react-redux";
+import { loginSuccess, restoreSession } from "./authentication/authSlice";
 
 const { width, height } = Dimensions.get("window");
 
@@ -22,72 +25,116 @@ const LoginScreen = () => {
   const router = useRouter();
   const [form, setForm] = useState({ email: "", password: "" });
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
   const handleInputChange = (key: string, value: string) => {
     setForm({ ...form, [key]: value });
   };
 
-  const handleLogin = () => {
-    if (!form.email || !form.password) {
-      alert("Please enter both email and password");
-      return;
+  const dispatch = useDispatch();
+  useEffect(() => {
+    const checkLogin = async () => {
+      const token = await AsyncStorage.getItem("token");
+      if (token) {
+        dispatch(restoreSession(token));
+        router.replace("/tabs/home");
+      }
+    };
+    checkLogin();
+  }, []);
+
+  const handleLogin = async () => {
+    try {
+      const response = await fetch("https://fakestoreapi.com/auth/login", {
+        method: "POST",
+        body: JSON.stringify({
+          username: form.email,
+          password: form.password,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error("Login failed");
+      }
+  
+      const data = await response.json();
+  
+      if (data.token) {
+        console.log("Token received:", data.token);
+        await AsyncStorage.setItem("token", data.token);
+        dispatch(loginSuccess(data.token));
+        router.replace("/tabs/home");
+      } else {
+        alert("Invalid credentials");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      alert("Login failed");
     }
-    console.log("Logged In:", form);
-    router.push("/signup");
   };
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener("keyboardDidShow", () => {
+      setKeyboardVisible(true);
+    });
+
+    const keyboardDidHideListener = Keyboard.addListener("keyboardDidHide", () => {
+      setKeyboardVisible(false);
+    });
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
 
   return (
-    <ImageBackground source={IMAGES.background} style={styles.background} resizeMode="cover">
-      <View style={styles.container}>
-        <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
-          
-          <Image source={IMAGES.clogo} style={styles.logo} />
+    <BackgroundScreen useImageBackground={true} buttonText="Log In" buttonPosition={0.24} onButtonPress={handleLogin}>
+      <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
+        <Image source={IMAGES.clogo} style={styles.logo} />
 
-          <Text style={styles.title}>Log In</Text>
-          <Text style={styles.subText}>Enter your email and password</Text>
+        <Text style={styles.title}>Log In</Text>
+        <Text style={styles.subText}>Enter your email and password</Text>
 
-          <View style={styles.inputWrapper}>
-            <Text style={styles.label}>Email</Text>
+        <View style={styles.inputWrapper}>
+          <Text style={styles.label}>Email</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your email"
+            placeholderTextColor={COLORS.textLight}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            value={form.email}
+            onChangeText={(text) => handleInputChange("email", text)}
+          />
+          <View style={styles.divider} />
+        </View>
+
+        <View style={styles.inputWrapper}>
+          <Text style={styles.label}>Password</Text>
+          <View style={styles.passwordContainer}>
             <TextInput
-              style={styles.input}
-              placeholder="Enter your email"
+              style={styles.passwordInput}
+              placeholder=""
               placeholderTextColor={COLORS.textLight}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              value={form.email}
-              onChangeText={(text) => handleInputChange("email", text)}
+              secureTextEntry={!passwordVisible}
+              value={form.password}
+              onChangeText={(text) => handleInputChange("password", text)}
             />
-            <View style={styles.divider} />
+            <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)} style={styles.eyeIcon}>
+              <Ionicons name={passwordVisible ? "eye-off" : "eye"} size={24} color={COLORS.textLight} />
+            </TouchableOpacity>
           </View>
+          <View style={styles.divider} />
+        </View>
 
-          <View style={styles.inputWrapper}>
-            <Text style={styles.label}>Password</Text>
-            <View style={styles.passwordContainer}>
-              <TextInput
-                style={styles.passwordInput}
-                placeholder=""
-                placeholderTextColor={COLORS.textLight}
-                secureTextEntry={!passwordVisible}
-                value={form.password}
-                onChangeText={(text) => handleInputChange("password", text)}
-              />
-              <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)} style={styles.eyeIcon}>
-                <Ionicons name={passwordVisible ? "eye-off" : "eye"} size={24} color={COLORS.textLight} />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.divider} />
-          </View>
+        <TouchableOpacity onPress={() => console.log("Forgot Password Pressed")}>
+          <Text style={styles.forgotPassword}>Forgot Password?</Text>
+        </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => console.log("Forgot Password Pressed")}>
-            <Text style={styles.forgotPassword}>Forgot Password?</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.button} onPress={handleLogin}>
-            <Text style={styles.buttonText}>Log In</Text>
-          </TouchableOpacity>
-        </ScrollView>
-
-        <View style={styles.signupContainer}>
+        <View style={[styles.signupContainer, isKeyboardVisible && styles.signupContainerActive]}>
           <Text style={styles.signupText}>
             Don't have an account?{" "}
             <Text style={styles.signupLink} onPress={() => router.push("/signup")}>
@@ -95,24 +142,17 @@ const LoginScreen = () => {
             </Text>
           </Text>
         </View>
-      </View>
-    </ImageBackground>
+      </ScrollView>
+    </BackgroundScreen>
   );
 };
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    width: "100%",
-    height: "100%",
-  },
-  container: {
-    flex: 1,
-  },
+  
   scrollContainer: {
     flexGrow: 1,
-    paddingHorizontal: width * 0.05,
-    paddingTop: height * 0.1,
+    paddingTop: height * 0.07,
+    paddingBottom: height * 0.1, 
   },
   logo: {
     width: width * 0.12,
@@ -174,26 +214,16 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.medium,
     color: COLORS.textDark,
     textAlign: "right",
-    marginBottom: height * 0.03,
+    marginBottom: height * 0.05,
   },
-  button: {
-    backgroundColor: COLORS.primary,
-    width: "100%",
-    paddingVertical: height * 0.02,
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  buttonText: {
-    fontSize: SIZES.h3,
-    fontFamily: FONTS.medium,
-    color: COLORS.bright,
-  },
+
   signupContainer: {
-    position: "absolute",
-    bottom: height * 0.30,
+    marginTop: height * 0.09,
     width: "100%",
     alignItems: "center",
+  },
+  signupContainerActive: {
+    marginBottom: height * 0.02, 
   },
   signupText: {
     fontSize: SIZES.body,

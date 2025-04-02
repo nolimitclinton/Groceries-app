@@ -1,4 +1,5 @@
 import { useRouter } from "expo-router";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -15,9 +16,25 @@ const { width, height } = Dimensions.get("window");
 
 const OtpScreen = () => {
   const router = useRouter();
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener("keyboardDidShow", () => {
+      setKeyboardVisible(true);
+    });
+
+    const keyboardDidHideListener = Keyboard.addListener("keyboardDidHide", () => {
+      setKeyboardVisible(false);
+    });
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
 
   return (
-    <BackgroundScreen onBack={() => router.back()} onNext={() => router.push("/location")}>
+    <BackgroundScreen useImageBackground={true} onBack={() => router.back()} onNext={() => router.push("/location")}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <View style={styles.container}>
           <View style={styles.inputSection}>
@@ -35,7 +52,7 @@ const OtpScreen = () => {
             />
           </View>
 
-          <View style={styles.resendContainer}>
+          <View style={[styles.resendContainer, { bottom: keyboardVisible ? height * 0.24 : height * 0 }]}>
             <Text style={styles.resendText}>Resend Code</Text>
           </View>
         </View>
@@ -47,6 +64,7 @@ const OtpScreen = () => {
 const styles = StyleSheet.create({
   container: {
     width: "100%",
+    marginTop: height * 0.15,
   },
   inputSection: {
     alignItems: "flex-start",
@@ -55,7 +73,7 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: SIZES.h1,
-    fontFamily: FONTS.semiBold,  
+    fontFamily: FONTS.semiBold,
     color: COLORS.textDark,
     textAlign: "left",
     marginBottom: height * 0.01,
@@ -63,13 +81,13 @@ const styles = StyleSheet.create({
   },
   subText: {
     fontSize: SIZES.body,
-    fontFamily: FONTS.medium,  
+    fontFamily: FONTS.medium,
     color: COLORS.textGray,
     marginBottom: height * 0.02,
   },
   input: {
     fontSize: SIZES.h3,
-    fontFamily: FONTS.medium,  
+    fontFamily: FONTS.medium,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
     paddingBottom: height * 0.02,
@@ -79,11 +97,11 @@ const styles = StyleSheet.create({
   },
   resendContainer: {
     position: "absolute",
-    bottom: height * 0.23,
+    alignSelf: "flex-start",
   },
   resendText: {
     fontSize: SIZES.h3,
-    fontFamily: FONTS.medium,  
+    fontFamily: FONTS.medium,
     color: COLORS.primary,
     textAlign: "left",
   },

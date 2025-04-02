@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
 import { View, ActivityIndicator } from "react-native";
-import { Stack } from "expo-router";
 import * as Font from "expo-font";
+import { Stack } from "expo-router";
+import { CartProvider } from "./cartContext";
+import { Provider } from "react-redux";
+import { store } from "./authentication/store";
 
 export default function Layout() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -10,9 +13,11 @@ export default function Layout() {
     async function loadFonts() {
       await Font.loadAsync({
         "Gilroy-Regular": require("../assets/styles/Gilroy-Regular.ttf"),
+        "Gilroy-semiBold": require("../assets/styles/Gilroy-semiBold.ttf"),
         "Gilroy-Medium": require("../assets/styles/Gilroy-Medium.ttf"),
         "Gilroy-Heavy": require("../assets/styles/Gilroy-Heavy.ttf"),
         "Gilroy-Bold": require("../assets/styles/Gilroy-Bold.ttf"),
+        "Gilroy-normal": require("../assets/styles/Gilroy.ttf"),
       });
       setFontsLoaded(true);
     }
@@ -27,5 +32,16 @@ export default function Layout() {
     );
   }
 
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return (
+  <Provider store={store}>
+    <CartProvider>
+     <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="welcome" />
+      <Stack.Screen name="login" />
+      <Stack.Screen name="(tabs)" /> 
+      <Stack.Screen name="placeorder" />
+     </Stack>
+    </CartProvider>
+  </Provider>
+  );
 }

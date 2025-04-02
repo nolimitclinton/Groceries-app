@@ -2,7 +2,6 @@ import { Dimensions } from "react-native";
 
 const { width } = Dimensions.get("window");
 
-// Scale font size dynamically based on screen width
 const scaleFont = (size: number) => (width / 375) * size;
 
 export const COLORS = {
@@ -18,6 +17,10 @@ export const COLORS = {
   border: "#ddd",
   background: "#f9f9f9",
   bright: "#FFFFFF",
+  lightgray: "#F2F3F2",
+  star:"#F3603F",
+  buttonborder: "#E2E2E2",
+  checkoutprice: "#489E67",
 };
 
 export const FONTS = {
@@ -26,13 +29,19 @@ export const FONTS = {
   medium: "Gilroy-Medium",
   regular: "Gilroy-Regular",
   normal: "Gilroy",
+  heavy: "Gilroy-Heavy"
 };
 
 export const SIZES = {
   big: scaleFont(48),
+  h0: scaleFont(28),
   h1: scaleFont(26),
   h2: scaleFont(20),
   h3: scaleFont(18),
+  h4: scaleFont(24),
   body: scaleFont(16),
   small: scaleFont(14),
+  h5: scaleFont(13),
+  h6: scaleFont(12),
+  extrasmall: scaleFont(9),
 };
