@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useRouter } from "expo-router";
+import { useState, useEffect } from "react";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import {
   View,
   Text,
@@ -7,56 +7,76 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
+  ScrollView,
 } from "react-native";
 import { COLORS, FONTS, SIZES } from "assets/styles/theme";
 import { IMAGES } from "assets/images";
 import { Ionicons } from "@expo/vector-icons";
 import BackgroundScreen from "~/components/BackgroundScreen";
-import { useCart } from "./cartContext";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "./authentication/store";
+import { addToCart } from "./authentication/cartSlice";
+import { AppDispatch } from "./authentication/store";
 
 const { width, height } = Dimensions.get("window");
 
-const product = {
-  id: "10",
-  name: "Natural Red Apple",
-  description: "1kg, Price",
-  price: 4.99,
-  image: IMAGES.apple,
-  productdetail: "Apples Are Nutritious. Apples May Be Good For Weight Loss. Apples May Be Good For Your Heart. As Part Of A Healthful And Varied Diet.",
-};
-
 const ProductDetailScreen = () => {
   const router = useRouter();
-  const { addToCart } = useCart();
-
+  const { productId } = useLocalSearchParams();
+  const dispatch = useDispatch<AppDispatch>();
+  
+  const products = useSelector((state: RootState) => state.products.items);
+  
+  const product = products.find(p => p.id === Number(productId));
+  
   const [quantity, setQuantity] = useState(1);
-  const [totalPrice, setTotalPrice] = useState(product.price);
-
+  const [totalPrice, setTotalPrice] = useState(product?.price || 0);
   const [showDetails, setShowDetails] = useState(true);
   const [showNutrition, setShowNutrition] = useState(true);
   const [showReview, setShowReview] = useState(true);
 
+  useEffect(() => {
+    if (product) {
+      setTotalPrice(product.price * quantity);
+    }
+  }, [quantity, product]);
+
   const handleQuantityChange = (action: "increase" | "decrease") => {
     if (action === "increase") {
-      setQuantity((prev) => prev + 1);
-      setTotalPrice((prev) => prev + product.price);
+      setQuantity(prev => prev + 1);
     } else if (action === "decrease" && quantity > 1) {
-      setQuantity((prev) => prev - 1);
-      setTotalPrice((prev) => prev - product.price);
+      setQuantity(prev => prev - 1);
     }
   };
 
   const handleAddToCart = () => {
-    addToCart({
-      id: product.id,
-      name: product.name,
+    if (!product) return;
+    
+    dispatch(addToCart({
+      id: Date.now().toString(), 
+      productId: product.id,
+      name: product.title,
       price: product.price,
       quantity,
       image: product.image,
       description: product.description,
-    });
+    }));
+    
     router.replace("/tabs/cart");
   };
+
+  if (!product) {
+    return (
+      <BackgroundScreen
+        useImageBackground={false}
+        onBack={() => router.back()}
+      >
+        <View style={styles.container}>
+          <Text>Product not found</Text>
+        </View>
+      </BackgroundScreen>
+    );
+  }
 
   return (
     <BackgroundScreen
@@ -68,29 +88,43 @@ const ProductDetailScreen = () => {
       headerButtonImage={IMAGES.share}
       onHeaderButtonPress={() => console.log("Share Clicked")}
     >
-      
       <View style={styles.imageContainer}>
-        <Image source={product.image} style={styles.productImage} />
-        </View>
-
-        <View style={styles.container}>
+      <Image
+  source={
+    typeof product.image === "string"
+      ? { uri: product.image }
+      : product.image
+  }
+  style={styles.productImage}
+/>
+      </View>
+      <ScrollView 
+        contentContainerStyle={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}>
+      <View style={styles.contentContainer}>
         <View style={styles.productHeader}>
-          <Text style={styles.productName}>{product.name}</Text>
+          <Text style={styles.productName}>{product.title}</Text>
           <TouchableOpacity style={styles.favoriteIcon}>
             <Ionicons name="heart-outline" size={28} color={COLORS.textGray} />
           </TouchableOpacity>
         </View>
-        <Text style={styles.productDescription}>{product.description}</Text>
+        <Text style={styles.productDescription}>{product.category}</Text>
 
         <View style={styles.quantityPriceContainer}>
           <View style={styles.quantityContainer}>
-            <TouchableOpacity style={styles.quantityButton} onPress={() => handleQuantityChange("decrease")}>
+            <TouchableOpacity 
+              style={styles.quantityButton} 
+              onPress={() => handleQuantityChange("decrease")}
+            >
               <Ionicons name="remove-outline" size={25} color={COLORS.textGray} />
             </TouchableOpacity>
             <View style={styles.quantityBox}>
               <Text style={styles.quantityText}>{quantity}</Text>
             </View>
-            <TouchableOpacity style={styles.quantityButton} onPress={() => handleQuantityChange("increase")}>
+            <TouchableOpacity 
+              style={styles.quantityButton} 
+              onPress={() => handleQuantityChange("increase")}
+            >
               <Ionicons name="add-outline" size={25} color={COLORS.primary} />
             </TouchableOpacity>
           </View>
@@ -98,7 +132,10 @@ const ProductDetailScreen = () => {
         </View>
 
         <View style={styles.divider} />
-        <TouchableOpacity style={styles.sectionHeader} onPress={() => setShowDetails(!showDetails)}>
+        <TouchableOpacity 
+          style={styles.sectionHeader} 
+          onPress={() => setShowDetails(!showDetails)}
+        >
           <Text style={styles.sectionTitle}>Product Detail</Text>
           <Ionicons
             name={showDetails ? "chevron-down-outline" : "chevron-forward-outline"}
@@ -106,7 +143,7 @@ const ProductDetailScreen = () => {
             color={COLORS.textDark}
           />
         </TouchableOpacity>
-        {showDetails && <Text style={styles.productdetail}>{product.productdetail}</Text>}
+        {showDetails && <Text style={styles.productdetail}>{product.description}</Text>}
 
         <View style={styles.divider} />
         <TouchableOpacity style={styles.sectionHeader} onPress={() => setShowNutrition(!showNutrition)}>
@@ -140,11 +177,23 @@ const ProductDetailScreen = () => {
           </View>
         </TouchableOpacity>
       </View>
+      </ScrollView>
     </BackgroundScreen>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+    paddingBottom: height * 0.15, 
+  },
+  contentContainer: {
+    flex: 1,
+    backgroundColor: COLORS.bright,
+    marginTop: height * 0.40,
+    //paddingHorizontal: width * 0.05,
+    paddingBottom: height * 0.1,
+  },
   imageContainer: {
     position: "absolute",
     top: 0,

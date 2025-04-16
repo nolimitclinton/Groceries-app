@@ -17,7 +17,7 @@ import { IMAGES } from "assets/images";
 import BackgroundScreen from "~/components/BackgroundScreen";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch } from "react-redux";
-import { loginSuccess, restoreSession } from "./authentication/authSlice";
+import { loginSuccess } from "./authentication/authSlice";
 
 const { width, height } = Dimensions.get("window");
 
@@ -27,21 +27,11 @@ const LoginScreen = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
+  const dispatch = useDispatch();
+
   const handleInputChange = (key: string, value: string) => {
     setForm({ ...form, [key]: value });
   };
-
-  const dispatch = useDispatch();
-  useEffect(() => {
-    const checkLogin = async () => {
-      const token = await AsyncStorage.getItem("token");
-      if (token) {
-        dispatch(restoreSession(token));
-        router.replace("/tabs/home");
-      }
-    };
-    checkLogin();
-  }, []);
 
   const handleLogin = async () => {
     try {
@@ -62,19 +52,28 @@ const LoginScreen = () => {
   
       const data = await response.json();
   
-      if (data.token) {
-        console.log("Token received:", data.token);
-        await AsyncStorage.setItem("token", data.token);
-        dispatch(loginSuccess(data.token));
-        router.replace("/tabs/home");
-      } else {
-        alert("Invalid credentials");
-      }
+      
+    if (data.token) {
+      dispatch(loginSuccess(data.token));
+      router.replace("/tabs/home");
+    } else {
+      alert("Invalid credentials");
+    }
     } catch (error) {
       console.error("Login error:", error);
       alert("Login failed");
     }
   };
+ 
+useEffect(() => {
+  const checkAuth = async () => {
+    const token = await AsyncStorage.getItem('persist:root');
+    if (token) {
+      router.replace('/tabs/home');
+    }
+  };
+  checkAuth();
+}, []);
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener("keyboardDidShow", () => {
       setKeyboardVisible(true);
@@ -137,7 +136,7 @@ const LoginScreen = () => {
         <View style={[styles.signupContainer, isKeyboardVisible && styles.signupContainerActive]}>
           <Text style={styles.signupText}>
             Don't have an account?{" "}
-            <Text style={styles.signupLink} onPress={() => router.push("/signup")}>
+            <Text style={styles.signupLink} onPress={() => router.push("/intro")}>
               Sign Up
             </Text>
           </Text>

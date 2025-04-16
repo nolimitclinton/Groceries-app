@@ -14,61 +14,85 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS, FONTS, SIZES } from "assets/styles/theme";
 import { IMAGES } from "assets/images";
-import { useCart } from "../cartContext"; 
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProducts } from "../authentication/productSlice"; 
+import { Product } from "../authentication/productSlice";
+import { RootState } from "../authentication/store";
+import { AppDispatch } from "../authentication/store"; 
+import { addToCart } from "../authentication/cartSlice"; 
 
 const { width, height } = Dimensions.get("window");
-const generateUniqueId = (prefix: string) => `${prefix}-${Date.now()}-${Math.random()}`;
-
-const bestSelling = [
-  { id: "1", name: "Red Pepper", price: 4.99, image: IMAGES.redpepper },
-  { id: "2", name: "Ginger", price: 4.99, image: IMAGES.ginger },
-];
-
-const groceries = [
-  { id: "3", name: "Beef Bone", price: 4.99, image: IMAGES.beef },
-  { id: "4", name: "Broiler Chicken", price: 4.99, image: IMAGES.chicken },
-];
-
-const exclusiveOffers = [
-  { id: "5", name: "Organic Bananas", price: 4.99, image: IMAGES.banana },
-  { id: "6", name: "Red Apple", price: 4.99, image: IMAGES.apple },
-];
-
-const groceryCategories = [
-  { id: "7", name: "Pulses", image: IMAGES.pulses, backgroundColor: "#FCEFD3" },
-  { id: "8", name: "Rice", image: IMAGES.rice, backgroundColor: "#E6F4E6" },
-];
 
 const HomeScreen = () => {
   const router = useRouter();
-  const { addToCart } = useCart(); 
+  const dispatch = useDispatch<AppDispatch>();
+  const generateUniqueId = (prefix = 'item') => `${prefix}-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
 
-  const renderProduct = ({ item }: { item: { id: string; name: string; price: number; image: any } }) => (
-    <View style={styles.productContainer}>
-      <TouchableOpacity onPress={() => router.push(`/productdetail`)} activeOpacity={0.8}>
-        <Image source={item.image} style={styles.productImage} />
-        <Text style={styles.productName}>{item.name}</Text>
-        <Text style={styles.productWeight}>1kg, Price</Text>
-        <Text style={styles.productPrice}>${item.price.toFixed(2)}</Text>
-      </TouchableOpacity>
+  const { items: products, loading, error } = useSelector((state: RootState) => state.products);
 
-      <TouchableOpacity
-        style={styles.plusButton} activeOpacity={0.8}
-        onPress={() => addToCart({
-          id: generateUniqueId(item.name),
-          name: item.name,
-          description: "1kg, Price", 
-          price: item.price, 
-          image: item.image,
-          quantity: 1,
-        })}>
-        <Image source={IMAGES.addButton} style={styles.plusIcon} />
-      </TouchableOpacity>
-    </View>
-  );
+  useEffect(() => {
+    dispatch(fetchProducts());
+  }, [dispatch]);
+
+  const exclusiveOffers = products.slice(0, 5);
+  const bestSelling = products.slice(5, 10);
+  const groceries = products.slice(10, 15);
+
+  const groceryCategories = [
+    { id: "7", name: "Pulses", image: IMAGES.pulses, backgroundColor: "#FCEFD3" },
+    { id: "8", name: "Rice", image: IMAGES.rice, backgroundColor: "#E6F4E6" },
+  ];
+
+  const renderProduct = ({ item }: { item: Product }) => {
+    const imageSource = typeof item.image === 'string' 
+      ? { uri: item.image } 
+      : item.image;
+    
+    return (
+      <View style={styles.productContainer}>
+        <TouchableOpacity 
+          onPress={() => router.push({ pathname: "/productdetail", params: { productId: item.id }})}  
+          activeOpacity={0.8}
+        >
+          <Image 
+            source={imageSource}
+            style={styles.productImage}
+            defaultSource={IMAGES.flag} 
+          />
+          <Text style={styles.productName} numberOfLines={2} ellipsizeMode="tail">
+            {item.title}
+          </Text>
+          <Text style={styles.productWeight} numberOfLines={1} ellipsizeMode="tail">
+            {item.category}
+          </Text>
+          <Text style={styles.productPrice}>${item.price.toFixed(2)}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.plusButton}
+          activeOpacity={0.8}
+          onPress={() => dispatch(addToCart({
+            id: generateUniqueId("cart"),
+            productId: item.id,
+            name: item.title,
+            description: item.description,
+            price: item.price,
+            image: typeof item.image === "string" ? item.image : Image.resolveAssetSource(item.image).uri,
+            quantity: 1,
+          }))}
+        >
+          <Image source={IMAGES.addButton} style={styles.plusIcon} />
+        </TouchableOpacity>
+      </View>
+    );
+  };
 
   const renderCategory = ({ item }: { item: { id: string; name: string; image: any; backgroundColor: string } }) => (
-    <TouchableOpacity style={[styles.categoryCard, { backgroundColor: item.backgroundColor }]}activeOpacity={0.8}>
+    <TouchableOpacity 
+      style={[styles.categoryCard, { backgroundColor: item.backgroundColor }]}
+      activeOpacity={0.8}
+    >
       <Image source={item.image} style={styles.categoryImage} />
       <Text style={styles.categoryName}>{item.name}</Text>
     </TouchableOpacity>
@@ -77,7 +101,6 @@ const HomeScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
-        
         <Image source={IMAGES.clogo} style={styles.logo} />
 
         <View style={styles.locationContainer}>
@@ -101,7 +124,7 @@ const HomeScreen = () => {
         <FlatList
           data={exclusiveOffers}
           renderItem={renderProduct}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.id.toString()}
           horizontal
           showsHorizontalScrollIndicator={false}
         />
@@ -115,7 +138,7 @@ const HomeScreen = () => {
         <FlatList
           data={bestSelling}
           renderItem={renderProduct}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.id.toString()}
           horizontal
           showsHorizontalScrollIndicator={false}
         />
@@ -139,7 +162,7 @@ const HomeScreen = () => {
         <FlatList
           data={groceries}
           renderItem={renderProduct}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.id.toString()}
           horizontal
           showsHorizontalScrollIndicator={false}
         />

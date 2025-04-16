@@ -1,26 +1,91 @@
 import React, { useState } from "react";
-import { 
-  View, 
-  Text, 
-  Image, 
-  TouchableOpacity, 
-  FlatList, 
-  StyleSheet, 
-  Dimensions, 
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  FlatList,
+  StyleSheet,
+  Dimensions,
   Modal,
-  SafeAreaView
+  SafeAreaView,
 } from "react-native";
-import { useCart } from "../cartContext";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../authentication/store";
+import { CartItem, removeFromCart, updateQuantity } from "../authentication/cartSlice";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS, FONTS, SIZES } from "assets/styles/theme";
 import { useRouter } from "expo-router";
 import { IMAGES } from "~/assets/images";
+import { AppDispatch } from "../authentication/store"; 
+import { Product } from "../authentication/productSlice"; 
+
+
 const { width, height } = Dimensions.get("window");
 
 const CartScreen = () => {
-  const { cart, totalCost, updateQuantity, removeFromCart } = useCart();
-  const [isCheckoutVisible, setCheckoutVisible] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
+
+  const cartItems = useSelector((state: RootState) => state.cart.items);
+  const products = useSelector((state: RootState) => state.products.items);
+
+  const totalCost = cartItems.reduce((sum, item) => {
+    const product = products.find((p: Product) => p.id === item.productId);
+    return product ? sum + product.price * item.quantity : sum;
+  }, 0);
+
+  const [isCheckoutVisible, setCheckoutVisible] = useState(false);
+
+  const renderCartItem = ({ item }: { item: CartItem }) => {
+    const product = products.find((p: Product) => p.id === item.productId);
+    if (!product) return null;
+
+    return (
+      <>
+        <View style={styles.cartItem}>
+          <Image source={{ uri: product.image }} style={styles.productImage} />
+
+          <View style={styles.productDetailsContainer}>
+            <View style={styles.productNameContainer}>
+              <Text style={styles.productName}>{product.title}</Text>
+              <TouchableOpacity onPress={() => dispatch(removeFromCart(item.id))}>
+                <Ionicons name="close" size={20} color={COLORS.textGray} />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.productDescription}>{product.category}</Text>
+
+            <View style={styles.quantityPriceContainer}>
+              <View style={styles.quantityControls}>
+                <TouchableOpacity
+                  onPress={() => dispatch(updateQuantity({ id: item.id, quantity: Math.max (1,item.quantity - 1 )}))}
+                  style={styles.quantityButtonContainer}
+                >
+                  <Ionicons name="remove-outline" size={20} color={COLORS.textDark} />
+                </TouchableOpacity>
+
+                <Text style={styles.quantityText}>{item.quantity}</Text>
+
+                <TouchableOpacity
+                  onPress={() => dispatch(updateQuantity({ id: item.id, quantity: item.quantity + 1 }))}
+                  style={styles.quantityButtonContainer}
+                >
+                  <Ionicons name="add-outline" size={20} color={COLORS.primary} />
+                </TouchableOpacity>
+              </View>
+
+              <Text style={styles.productPrice}>
+                ${(product.price * item.quantity).toFixed(2)}
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.divider} />
+      </>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -29,61 +94,19 @@ const CartScreen = () => {
       </View>
 
       <FlatList
-        data={cart}
-        keyExtractor={(item) => item.id.toString()}
-        extraData={cart}
-        renderItem={({ item }) => (
-          <>
-            <View style={styles.cartItem}>
-              <Image source={item.image} style={styles.productImage} />
-
-              <View style={styles.productDetailsContainer}>
-                <View style={styles.productNameContainer}>
-                  <Text style={styles.productName}>{item.name}</Text>
-                  <TouchableOpacity onPress={() => removeFromCart(item.id)}>
-                    <Ionicons name="close" size={20} color={COLORS.textGray} />
-                  </TouchableOpacity>
-                </View>
-
-                <Text style={styles.productDescription}>{item.description}</Text>
-
-                <View style={styles.quantityPriceContainer}>
-                  <View style={styles.quantityControls}>
-                    <View style={styles.quantityButtonContainer}>  
-                      <TouchableOpacity 
-                        onPress={() => updateQuantity(item.id, item.quantity - 1)} 
-                        style={styles.quantityButton}
-                      >
-                        <Ionicons name="remove-outline" size={20} color={COLORS.textDark} />
-                      </TouchableOpacity>
-                    </View>
-
-                    <Text style={styles.quantityText}>{item.quantity} </Text>
-                    
-                    <View style={styles.quantityButtonContainer}>  
-                      <TouchableOpacity 
-                        onPress={() => updateQuantity(item.id, item.quantity + 1)} 
-                        style={styles.quantityButton} 
-                      >
-                        <Ionicons name="add-outline" size={20} color={COLORS.primary} />
-                      </TouchableOpacity> 
-                    </View> 
-                  </View>
-
-                  <Text style={styles.productPrice}>${(item.price * item.quantity).toFixed(2)}</Text>
-                </View>
-              </View>
-            </View>
-
-            <View style={styles.divider} />
-          </>
-        )}
+        data={cartItems}
+        keyExtractor={(item) => item.id}
+        renderItem={renderCartItem}
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={false}
       />
 
       <View style={styles.checkoutButtonContainer}>
-        <TouchableOpacity style={styles.checkoutButton} activeOpacity={0.8} onPress={() => setCheckoutVisible(true)}>
+        <TouchableOpacity
+          style={styles.checkoutButton}
+          activeOpacity={0.8}
+          onPress={() => setCheckoutVisible(true)}
+        >
           <Text style={styles.checkoutText}>Go to Checkout</Text>
           <View style={styles.totalCostBadge}>
             <Text style={styles.checkoutPrice}>${totalCost.toFixed(2)}</Text>
@@ -108,6 +131,7 @@ const CartScreen = () => {
                 <Image source={IMAGES.forward} style={styles.forwardArrow} />
               </View>
             </TouchableOpacity>
+
             <TouchableOpacity style={styles.modalOption}>
               <Text style={styles.modalOptionText}>Payment</Text>
               <View style={styles.modalOptionRight}>
@@ -115,6 +139,7 @@ const CartScreen = () => {
                 <Image source={IMAGES.forward} style={styles.forwardArrow} />
               </View>
             </TouchableOpacity>
+
             <TouchableOpacity style={styles.modalOption}>
               <Text style={styles.modalOptionText}>Promo Code</Text>
               <View style={styles.modalOptionRight}>
@@ -134,13 +159,14 @@ const CartScreen = () => {
             </View>
 
             <Text style={styles.termsText}>
-              By placing an order you agree to our <Text style={styles.termsBold}>Terms And Conditions</Text>
+              By placing an order you agree to our{" "}
+              <Text style={styles.termsBold}>Terms And Conditions</Text>
             </Text>
-            <TouchableOpacity 
-              style={styles.placeOrderButton} 
+            <TouchableOpacity
+              style={styles.placeOrderButton}
               onPress={() => {
-                setCheckoutVisible(false); 
-                router.push("/placeorder"); 
+                setCheckoutVisible(false);
+                router.push("/placeorder");
               }}
             >
               <Text style={styles.placeOrderText}>Place Order</Text>
@@ -151,6 +177,7 @@ const CartScreen = () => {
     </SafeAreaView>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: { 

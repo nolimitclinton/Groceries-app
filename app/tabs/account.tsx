@@ -6,6 +6,7 @@ import { logout } from "../authentication/authSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch } from "react-redux";
 import { useRouter } from "expo-router"; 
+import { persistor } from "../authentication/store";
 
 const { width, height } = Dimensions.get("window");
 
@@ -15,9 +16,13 @@ const AccountScreen = () => {
   const router = useRouter();
 
   const handleLogout = async () => {
-    await AsyncStorage.removeItem("token");     
-    dispatch(logout());                         
-    router.replace("/login");                   
+    try {
+      dispatch(logout());
+      await persistor.purge();
+      router.replace('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
   const options = [
     { id: "orders", label: "Orders", image: IMAGES.orders },

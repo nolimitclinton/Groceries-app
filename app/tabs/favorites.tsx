@@ -13,32 +13,40 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { COLORS, FONTS, SIZES } from "assets/styles/theme";
 import { IMAGES } from "assets/images";
-import { useCart } from "../cartContext"; 
+import { useDispatch } from "react-redux";
+import { addToCart } from "../authentication/cartSlice";
+import { AppDispatch } from "../authentication/store";
 
 const { width, height } = Dimensions.get("window");
-const generateUniqueId = (prefix: string) => `${prefix}-${Date.now()}-${Math.random()}`;
 
 const favorites = [
-  { id: "1", name: "Sprite Can", description: "325ml, Price", price: 1.50, image: IMAGES.sprite },
-  { id: "2", name: "Diet Coke", description: "355ml, Price", price: 1.99, image: IMAGES.dietcoke },
-  { id: "3", name: "Apple & Grape Juice", description: "2L, Price", price: 15.50, image: IMAGES.applegrape },
-  { id: "4", name: "Coca Cola Can", description: "325ml, Price", price: 4.99, image: IMAGES.cocacola },
-  { id: "5", name: "Pepsi Can", description: "330ml, Price", price: 4.99, image: IMAGES.pepsi },
+  { id: 1, name: "Sprite Can", description: "325ml, Price", price: 1.50, image: IMAGES.sprite },
+  { id: 2, name: "Diet Coke", description: "355ml, Price", price: 1.99, image: IMAGES.dietcoke },
+  { id: 3, name: "Apple & Grape Juice", description: "2L, Price", price: 15.50, image: IMAGES.applegrape },
+  { id: 4, name: "Coca Cola Can", description: "325ml, Price", price: 4.99, image: IMAGES.cocacola },
+  { id: 5, name: "Pepsi Can", description: "330ml, Price", price: 4.99, image: IMAGES.pepsi },
 ];
 
 const FavoritesScreen = () => {
   const router = useRouter();
-  const { addToCart } = useCart(); 
+  const dispatch = useDispatch<AppDispatch>();
 
   const handleAddAllToCart = () => {
     favorites.forEach((item) => {
-      addToCart({ ...item, id: generateUniqueId(item.name),quantity: 1 }); 
+      dispatch(addToCart({
+        id: Date.now().toString(),
+        productId: item.id,
+        name: item.name,
+        price: item.price,
+        image: item.image,
+        quantity: 1,
+        description: item.description,
+      }));
     });
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Favourite</Text> 
       </View>
@@ -47,7 +55,20 @@ const FavoritesScreen = () => {
         data={favorites}
         renderItem={({ item }) => (
           <>
-            <TouchableOpacity style={styles.favoriteItem} activeOpacity={0.8}>
+            <TouchableOpacity 
+              style={styles.favoriteItem} 
+              activeOpacity={0.8}
+              onPress={() => router.push({
+                pathname: "/productdetail",
+                params: { 
+                  productId: item.id.toString(),
+                  name: item.name,
+                  price: item.price,
+                  description: item.description,
+                  image: item.image
+                }
+              })}
+            >
               <Image source={item.image} style={styles.productImage} />
               <View style={styles.productInfo}>
                 <Text style={styles.productName}>{item.name}</Text>
@@ -59,11 +80,15 @@ const FavoritesScreen = () => {
             <View style={styles.divider} />
           </>
         )}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.listContainer}
       />
 
-      <TouchableOpacity style={styles.addToCartButton} activeOpacity={0.8} onPress={handleAddAllToCart}>
+      <TouchableOpacity 
+        style={styles.addToCartButton} 
+        activeOpacity={0.8} 
+        onPress={handleAddAllToCart}
+      >
         <Text style={styles.buttonText}>Add All To Cart</Text>
       </TouchableOpacity>
     </SafeAreaView>

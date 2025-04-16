@@ -50,7 +50,7 @@ const LocationScreen = () => {
       useImageBackground={true}
       buttonText="Submit"
       buttonPosition={0.0}
-      onButtonPress={() => router.push("/login")}
+      onButtonPress={() => router.push("/signup")}
       onBack={() => router.back()}
     >
       <View style={styles.container}>
